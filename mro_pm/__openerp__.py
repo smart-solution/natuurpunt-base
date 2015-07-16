@@ -47,11 +47,11 @@ Required modules:
     'depends': ['mro'],
     'demo': ['mro_pm_demo.xml'],
     'data': [
-        'security/ir.model.access.csv',
-        'wizard/replan_view.xml',
-        'mro_pm_view.xml',
-        'mro_pm_sequence.xml',
-        'asset_view.xml',
+#        'security/ir.model.access.csv',
+#        'wizard/replan_view.xml',
+#        'mro_pm_view.xml',
+#        'mro_pm_sequence.xml',
+#        'asset_view.xml',
     ],
     'installable': True,
 }

@@ -30,14 +30,14 @@
             <field name="context">{}</field>
             <field name="view_id" ref="mro_pm_meter_tree_view"/>
         </record>
-
+        <!--
         <menuitem name="Update Meters"
             action="action_update_meters"
             id="menu_update_meters"
             parent="mro.menu_mro_maintenance"
             groups="mro.group_mro_user"
             sequence="20"/>
-
+-->
             
         <!-- Meters Logs menu -->
         
@@ -323,13 +323,14 @@
             
             
         <!-- Replan PM menu -->
+        <!--
         <menuitem name="Replan PM"
             action="action_replan_pm"
             id="menu_replan_pm"
             parent="mro.menu_mro_maintenance"
             groups="mro.group_mro_user"
             sequence="30"/>
-
+-->
     
  	</data>
 </openerp>

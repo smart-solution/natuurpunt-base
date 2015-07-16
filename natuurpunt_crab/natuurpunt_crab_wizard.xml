@@ -57,8 +57,8 @@
         <field name="target">new</field>
         <field name="view_id" ref="crab_import_feedback_view" />
     </record>
-
-        <menuitem id="menu_crab" name="Crab" parent="base.menu_config" sequence="10"/>
+        
+        <menuitem name="Crab" parent="base.menu_marketing_config_association" id="menu_crab" sequence="10" groups="natuurpunt_crm.group_natuurpunt_crm_manager"/>
 
         <menuitem id="menu_import_crab" name="Import Crab File" parent="menu_crab" action="action_crab_import"/>
 
