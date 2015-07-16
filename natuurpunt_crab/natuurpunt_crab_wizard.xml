@@ -1,0 +1,66 @@
+<?xml version="1.0" ?>
+<openerp>
+    <data>
+
+    <record id="crab_import_view" model="ir.ui.view">
+      <field name="name">import.crab</field>
+      <field name="model">res.country.city.street.import</field>
+      <field name="priority">1</field>
+      <field name="arch" type="xml">
+        <form string="Import CRAB CSV File" version="7.0">
+            <group col="2">
+                <field name="crab_data" filename="crab_fname" default_focus="1"/>
+                  <field name="dry_run"/>
+                  <field name="delimiter"/>
+            </group>
+            <footer>
+                <button name="import_crab_csv" string="_Import" type="object" class="oe_highlight"/>
+                or
+                <button string="Cancel" class="oe_link" special="cancel"/>
+            </footer>
+        </form>
+      </field>
+    </record>
+
+    <record id="crab_import_feedback_view" model="ir.ui.view">
+      <field name="name">feedback.crab</field>
+      <field name="model">res.country.city.street.feedback</field>
+      <field name="arch" type="xml">
+        <form string="Warning" version="7.0">
+          <field name="message" nolabel="1"/>
+          <div class="header">
+            <field name="feedback_stream" nolabel="1" filename="feedback_fname"/>
+          </div>
+          <footer>
+            <button string="OK" class="oe_highlight" special="cancel"/>
+          </footer>
+        </form>
+      </field>
+    </record>
+
+    <record id="action_crab_import" model="ir.actions.act_window">
+                <field name="name">Import CRAB CSV</field>
+                <field name="type">ir.actions.act_window</field>
+        <field name="res_model">res.country.city.street.import</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="view_id" ref="crab_import_view"/>
+    </record>
+
+    <record id="action_crab_import_feedback" model="ir.actions.act_window">
+                <field name="name">Import CRAB CSV Feedback</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">res.country.city.street.feedback</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="view_id" ref="crab_import_feedback_view" />
+    </record>
+
+        <menuitem id="menu_crab" name="Crab" parent="base.menu_config" sequence="10"/>
+
+        <menuitem id="menu_import_crab" name="Import Crab File" parent="menu_crab" action="action_crab_import"/>
+
+  </data>
+</openerp>

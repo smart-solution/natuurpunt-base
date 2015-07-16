@@ -1,0 +1,74 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+
+    <!--
+       partner_type Views 
+   -->
+
+    <record model="ir.ui.view" id="view_partner_classification_tree">
+        <field name="name">view.partner_classification.tree</field>
+        <field name="model">res.partner.classification</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree string="Partner Class">
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="view_partner_classification_form">
+        <field name="name">view.partner_classification.form</field>
+        <field name="model">res.partner.classification</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="Partner Class">
+		<group colspan="4" col="2">
+    		    <field name="name"/>
+                    <field name="debit"/>
+                    <field name="credit"/>
+		</group>
+            </form>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="action_partner_classification">
+        <field name="name">Partner Classes</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">res.partner.classification</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="view_partner_classification_tree"/>
+    </record>
+
+    <record model="ir.actions.act_window.view" id="action_partner_classification_tree_view">
+        <field name="sequence">10</field>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="view_partner_classification_tree"/>
+        <field name="act_window_id" ref="action_partner_classification"/>
+    </record>
+
+    <record model="ir.actions.act_window.view" id="action_partner_classification_form_view">
+        <field name="sequence">20</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_partner_classification_form"/>
+        <field name="act_window_id" ref="action_partner_classification"/>
+    </record>
+
+    <menuitem name="Partner Classes" id="menu_partner_classification_form" action="action_partner_classification" parent = "base.menu_base_config" sequence="100"/>
+
+    <record model="ir.ui.view" id="partner_classification_partner_form">
+        <field name="name">partner.classification.partner.form</field>
+        <field name="model">res.partner</field>
+	<field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <field name="category_id" position="after">
+                <field name="partner_classification_id" placeholder="Partner Class"/>
+            </field>
+        </field>
+    </record>
+
+    </data>
+</openerp>
+

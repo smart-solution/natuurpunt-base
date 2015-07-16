@@ -1,0 +1,69 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+
+    <record model="ir.ui.view" id="npdm_partner_form">
+        <field name="name">npdm.partner.form</field>
+        <field name="model">res.partner</field>
+	<field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <notebook position="inside">
+                <page string="Old Codes" groups="account.group_account_invoice">
+                    <group name="grp_oldcodes" string="Old Codes">
+                        <field name="old_code_ids" colspan="4" nolabel="1">
+                            <tree string="Old Codes" editable="bottom">
+                                <field name="company_id"/>
+                                <field name="old_code"/>
+                            </tree>
+                        </field>
+                     </group> 
+ 		</page> 
+             </notebook>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="npdm_account_form">
+        <field name="name">npdm.account.form</field>
+        <field name="model">account.account</field>
+	<field name="inherit_id" ref="account.view_account_form"/>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <field name="note" position="after">
+                    <group name="grp_oldcodes" string="Old Codes">
+                        <field name="old_code_ids" colspan="4" nolabel="1">
+                            <tree string="Old Codes" editable="bottom">
+                                <field name="company_id"/>
+                                <field name="old_code"/>
+                            </tree>
+                        </field>
+                     </group> 
+            </field> 
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="npdm_journal_form">
+        <field name="name">npdm.journal.form</field>
+        <field name="model">account.journal</field>
+	<field name="inherit_id" ref="account.view_account_journal_form"/>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <notebook position="inside">
+                <page string="Old Codes">
+                    <group name="grp_oldcodes" string="Old Codes">
+                        <field name="old_code_ids" colspan="4" nolabel="1">
+                            <tree string="Old Codes" editable="bottom">
+                                <field name="company_id"/>
+                                <field name="old_code"/>
+                            </tree>
+                        </field>
+                     </group> 
+ 		</page>
+             </notebook>
+        </field>
+    </record>
+
+    </data>
+</openerp>
+
+
