@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+
+        <!-- Top menu item -->
+    <menuitem name="Contacts"
+            id="natuurpunt_contacten.menu_contact"
+            groups="base.group_user"
+            sequence="45"/>
+
+        <record id="view_natuurpunt_contacten_partner_tree" model="ir.ui.view">
+            <field name='name'>view.natuurpunt.contacten.partner.tree</field>
+            <field name='model'>res.partner</field>
+            <field name='arch' type='xml'>
+                <tree string="Address Book">
+						<field name="id"/>
+                        <field name="name"/>
+						<field name="street"/>
+						<field name="zip"/>
+						<field name="city"/>
+						<field name="email"/>
+						<field name="phone"/>
+						<field name="mobile"/>
+                </tree>
+            </field>
+        </record>
+                
+		<record id="view_natuurpunt_partner_search_contacten" model="ir.ui.view">
+			<field name="name">view.natuurpunt.partner.search.contacten</field>
+			<field name="model">res.partner</field>
+			<field name="inherit_id" ref="natuurpunt_crm.view_np_partner_search_crm"/>
+			<field name="arch" type="xml">
+				<field name="id" position="replace">
+					<field name="membership_nbr"/>
+				</field>
+			</field>
+		</record>        
+        
+        <record model="ir.actions.act_window" id="action_addressbook_form">
+            <field name="name">Address Book</field>
+            <field name="res_model">res.partner</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_type">form</field>
+            <field name="context">{'addressbook': 1}</field>
+            <field name="view_id" ref="view_natuurpunt_contacten_partner_tree"/>
+        </record>
+
+
+    <menuitem name="Address Book" parent="natuurpunt_contacten.menu_contact" id="menu_report_addressbook" sequence="30"/>
+    <menuitem name="Address Book" parent="menu_report_addressbook" id="menu_addressbook" sequence="5" action="action_addressbook_form"/>
+    </data>
+</openerp>
+
