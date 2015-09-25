@@ -7,11 +7,12 @@
 {
     "name" : "Natuurpunt Website",
     "version" : "1.0",
-    "author" : "Joeri Belis",
+    "author" : "Natuurpunt (joeri.belis@natuurpunt.be)",
+    "website" : "www.natuurpunt.be",
     "category" : "Base",
-    "description": """
+    "description": """Website statistics for a partner (visits, last login date)
 """,
-    "depends" : ['base'],
+    "depends" : ['natuurpunt_crm'],
     "active": False,
     "installable": True
 }
