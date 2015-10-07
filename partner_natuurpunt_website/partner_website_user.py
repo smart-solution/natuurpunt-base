@@ -11,6 +11,7 @@ class res_partner(osv.osv):
     _inherit = 'res.partner'
 
     _columns = {
+                'password_website': fields.char('Password website'),
                 'visits': fields.integer('Number of visits'),
                 'last_login': fields.date('Last login'),
     }
