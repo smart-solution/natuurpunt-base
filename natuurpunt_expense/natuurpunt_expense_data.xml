@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+
+    <data noupdate="0">
+        <record id="natuurpunt_expense.account_expense" model="ir.actions.report.xml">
+            <field name="attachment_use" eval="False"/>
+        </record>
+    </data>
+
+</openerp>

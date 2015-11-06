@@ -1,0 +1,29 @@
+.field_binary {
+        width: 250px;//define the width here
+}
+.oe_form_binary_file_save_data {
+        visibility: hidden;
+}
+.oe_form_binary_file_clear {
+        visibility: hidden;
+}
+.header a:link{
+        color:#006699;
+        font-size:14px;
+        text-decoration:none;
+        padding:5px;
+        background-color:#DDEEFF;
+}
+.header a:visited{
+        color:#003399;
+        font-size:14px;
+        text-decoration:none;
+        padding:5px;
+        background-color:#DDEEFF;
+}
+.header a:hover{
+        color:#0099CC;
+        text-decoration:none;
+        padding:5px;
+        background-color:#E9FCFC;
+}

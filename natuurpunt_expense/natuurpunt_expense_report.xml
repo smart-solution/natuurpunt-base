@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data noupdate="0">
+        <report
+            attachment_use="False"
+            auto="False"
+            id="account_expense"
+            model="account.invoice"
+            name="account.expense"
+            rml="natuurpunt_expense/report/account_print_expense.rml"
+            string="Expenses"
+            attachment="(object.state in ('open','paid')) and ('EXP'+(object.number or '').replace('/','')+'.pdf')"
+            usage="default"
+            />
+
+    </data>
+</openerp>
