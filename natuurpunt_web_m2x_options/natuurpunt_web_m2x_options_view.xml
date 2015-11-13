@@ -1,0 +1,73 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+
+	<record id="view_np_customer_options" model="ir.ui.view">
+            <field name="name">view.np.customer.options</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="natuurpunt_vat_mandatory.natuurpunt_invoice_customer_vat_form" />
+            <field name="arch" type="xml">
+                <field name="partner_id" position="attributes">
+                     <attribute name="options">{'always_reload': True, 'limit': 10, 'create': false, 'create_edit': false}</attribute>
+                </field>
+            </field>
+	</record>
+
+	<record id="view_np_supplier_options" model="ir.ui.view">
+            <field name="name">view.np.supplier.options</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="natuurpunt_vat_mandatory.natuurpunt_invoice_supplier_vat_form" />
+            <field name="arch" type="xml">
+                <field name="partner_id" position="attributes">
+                     <attribute name="options">{'limit': 10, 'create': false, 'create_edit': false}</attribute>
+                </field>
+            </field>
+	</record>
+
+        <record id="view_account_analytic_account_form_options" model="ir.ui.view">
+            <field name="name">view.account.analytic.account.form.options</field>
+            <field name="model">account.analytic.account</field>
+            <field name="inherit_id" ref="analytic.view_account_analytic_account_form" />
+            <field name="arch" type="xml">
+                <field name="partner_id" position="attributes">
+                     <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field>
+            </field>
+        </record>
+
+        <record id="view_purchase_order_form_options" model="ir.ui.view">
+            <field name="name">view.purchase.form.options</field>
+            <field name="model">purchase.order</field>
+            <field name="inherit_id" ref="purchase.purchase_order_form" />
+            <field name="arch" type="xml">
+                <field name="partner_id" position="attributes">
+                     <attribute name="options">{'limit': 10, 'create': false, 'create_edit': false}</attribute>
+                </field>
+            </field>
+        </record>
+
+        <record id="view_natuurpunt_crm_partner_form_options" model="ir.ui.view">
+            <field name="name">view.natuurpunt.crm.partner.form.options</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="natuurpunt_crm.view_natuurpunt_crm_partner_form" />
+            <field name="arch" type="xml">
+                <field name="relation_partner_id" position="attributes">
+                     <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field>
+            </field>
+        </record>
+
+        <record id="view_organisation_partner_form_options" model="ir.ui.view">
+            <field name="name">view.organisation.partner.form.options</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="organisation_structure.organisation_partner_form" />
+            <field name="arch" type="xml">
+                <field name="partner_up_id" position="attributes">
+                     <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field>
+            </field>
+        </record>
+
+    </data>
+</openerp>
+
