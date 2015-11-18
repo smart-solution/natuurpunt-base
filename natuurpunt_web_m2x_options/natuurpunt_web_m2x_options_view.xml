@@ -32,7 +32,7 @@
                 <field name="partner_id" position="attributes">
                      <attribute name="options">{'create': false, 'create_edit': false}</attribute>
                 </field>
-                <field name="manager_id" position="attribute">
+                <field name="manager_id" position="attributes">
 				     <attribute name="options">{'create': false, 'create_edit': false}</attribute>
 				</field>
             </field>
