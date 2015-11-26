@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 ##############################################################################
 #
-#    Smart Solution bvba
-#    Copyright (C) 2010-Today Smart Solution BVBA (<http://www.smartsolution.be>).
+#    OpenERP, Open Source Management Solution
+#    Copyright (C) 2004-2010 Tiny SPRL (<http://tiny.be>).
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU Affero General Public License as
@@ -17,6 +17,23 @@
 #    You should have received a copy of the GNU Affero General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-############################################################################## 
+##############################################################################
 
-import natuurpunt_security
+import time
+from openerp.report import report_sxw
+
+class account_expense(report_sxw.rml_parse):
+    def __init__(self, cr, uid, name, context):
+	print "PARSER CALLED"
+        super(account_expense, self).__init__(cr, uid, name, context=context)
+        self.localcontext.update({
+            'time': time,
+        })
+
+report_sxw.report_sxw(
+    'report.account.expense',
+    'account.invoice',
+    'addons/natuurpunt_expense/report/account_print_expense.rml',
+    parser=account_expense
+)
+# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

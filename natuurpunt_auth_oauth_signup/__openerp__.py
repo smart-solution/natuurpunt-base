@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 ##############################################################################
 #
-#    Smart Solution bvba
-#    Copyright (C) 2010-Today Smart Solution BVBA (<http://www.smartsolution.be>).
-#
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU Affero General Public License as
 #    published by the Free Software Foundation, either version 3 of the
@@ -19,4 +16,18 @@
 #
 ############################################################################## 
 
-import natuurpunt_security
+{
+    "name" : "Signup with OAuth2 Authentication Natuurpunt",
+    "version" : "1.0",
+    "author" : "Natuurpunt (joeri.belis@natuurpunt.be)",
+    "website" : "www.natuurpunt.be",
+    "category" : "Hidden",
+    "description": """
+Allow Natuurpunt users to sign up through OAuth2 Provider after local user is created and configurated    
+""",
+    "depends" : ["auth_oauth","auth_signup"],    
+    "init_xml" : [],
+    "update_xml" : [],
+    "active": False,
+    "installable": True
+}

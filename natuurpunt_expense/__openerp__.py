@@ -19,4 +19,22 @@
 #
 ############################################################################## 
 
-import natuurpunt_security
+{
+    "name" : "natuurpunt_expense",
+    "version" : "1.0",
+    "author" : "Natuurpunt (joeri.belis@natuurpunt.be)",
+    "website" : "www.natuurpunt.be",
+    "category" : "Generic Modules/Base",
+    "description": """expenses rml report for model account.invoice
+""",
+    "depends" : ["natuurpunt_account"],
+    "init_xml" : [
+        ],
+    "update_xml" : [
+        'natuurpunt_expense_report.xml',
+        'natuurpunt_expense_data.xml',
+#        'security/ir.model.access.csv'
+        ],
+    "active": False,
+    "installable": True
+}

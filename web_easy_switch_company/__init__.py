@@ -1,8 +1,9 @@
-# -*- coding: utf-8 -*-
+# -*- encoding: utf-8 -*-
 ##############################################################################
 #
-#    Smart Solution bvba
-#    Copyright (C) 2010-Today Smart Solution BVBA (<http://www.smartsolution.be>).
+#    Web Easy Switch Company module for OpenERP
+#    Copyright (C) 2014 GRAP (http://www.grap.coop)
+#    @author Sylvain LE GAL (https://twitter.com/legalsylvain)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU Affero General Public License as
@@ -17,6 +18,7 @@
 #    You should have received a copy of the GNU Affero General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-############################################################################## 
+##############################################################################
 
-import natuurpunt_security
+import model
+import controllers

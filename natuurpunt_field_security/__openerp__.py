@@ -19,4 +19,17 @@
 #
 ############################################################################## 
 
-import natuurpunt_security
+{
+    "name" : "natuurpunt_field_security",
+    "version" : "1.0",
+    "author" : "Natuurpunt (joeri.belis@natuurpunt.be)",
+    "website" : "www.natuurpunt.be",
+    "category" : "Generic Modules/Base",
+    "description": """module to add unique constraint to res_partner zip_ids m2m field    
+""",
+    "depends" : ["organisation_structure"],
+    "init_xml" : [],
+    "update_xml" : [],
+    "active": False,
+    "installable": True
+}

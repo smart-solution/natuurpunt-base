@@ -1,0 +1,53 @@
+<?xml version="1.0" ?>
+<openerp>
+    <data>
+
+    <record id="print_crm_invoice_view" model="ir.ui.view">
+      <field name="name">print.invoice.wizard</field>
+      <field name="model">print.invoice.wizard</field>
+      <field name="priority">1</field>
+      <field name="arch" type="xml">
+        <form string="Print CRM Invoice" version="7.0">
+            <group col="2">            	
+            	<field name="layout"/>
+            	<field name="third_payer_id" invisible="1"/>          	
+            	<field name="use_third_payer_address" attrs="{'invisible': [('third_payer_id', '=', 0)]}"/>
+            	<field name="name"/>
+            </group>        
+            <footer>
+                <button name="print_crm_invoice" string="_Print" type="object" class="oe_highlight"/>
+                or
+                <button string="Cancel" class="oe_link" special="cancel"/>
+            </footer>
+        </form>
+      </field>
+    </record>
+    
+	<record id="view_account_np_print_inherit" model="ir.ui.view">
+    	<field name="name">view.account.np.print.inherit</field>
+        <field name="model">account.invoice</field>
+		<field name="inherit_id" ref="account.invoice_form" />
+        <field name="arch" type="xml">
+        	<xpath expr="//header/button[@name='invoice_print' and @string='Print']" position="replace">
+            	<button name="invoice_print" string="Print" type="object" class="oe_highlight" 
+            	attrs="{'invisible':[('state', '!=', 'open')]}" groups="base.group_user"/>
+			</xpath>
+        	<xpath expr="//header/button[@name='invoice_print' and @string='Print Invoice']" position="replace">
+            	<button name="invoice_print" string="Print" type="object" class="oe_highlight" 
+            	attrs="{'invisible':[('state','!=','paid')]}" groups="base.group_user"/>            	
+			</xpath>			
+		</field>
+	</record>
+    
+    <record id="action_print_crm_invoice" model="ir.actions.act_window">
+		<field name="name">Print CRM invoice</field>
+		<field name="type">ir.actions.act_window</field>
+        <field name="res_model">print.invoice.wizard</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="view_id" ref="print_crm_invoice_view"/>
+    </record>
+
+  </data>
+</openerp>

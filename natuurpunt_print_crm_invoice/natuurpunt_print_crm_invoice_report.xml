@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data noupdate="0">
+        <report
+            attachment_use="False"
+            auto="False"
+            id="account_invoice_thirdpayer"
+            model="account.invoice"
+            name="account.invoice.thirdpayer"
+            rml="natuurpunt_print_crm_invoice/report/account_print_invoice.rml"
+            string="Thirdpayer invoice"
+            attachment="(object.state in ('open','paid')) and ('INV'+(object.number or '').replace('/','')+'.pdf')"
+            usage="default"
+            menu="False"
+            />
+
+    </data>
+</openerp>
