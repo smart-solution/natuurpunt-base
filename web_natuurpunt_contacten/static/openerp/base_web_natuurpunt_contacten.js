@@ -36,6 +36,58 @@ openerp.web_natuurpunt_contacten = function(instance) {
 			return this._super.apply(this, arguments);
         },
     });
+    instance.web.Dialog.include({
+        open: function () {
+            this._super();
+            var self = this;
+            this.$extendbutton = $('<a href="#" class="dialog_button_extend"><span class="ui-icon ui-icon-plusthick">+</span>');
+            this.$restorebutton = $('<a href="#" class="dialog_button_restore"><span class="ui-icon ui-icon-minusthick">-</span>');
+
+            var dialog = this.$el.dialog("widget");
+            dialog.find(".ui-dialog-title").after(this.$extendbutton).after(this.$restorebutton);
+            dialog.on("click", "a.dialog_button_extend", {
+               max_height: this.dialog_options.max_height
+            }, self._extending);
+            dialog.on("click", "a.dialog_button_restore", {
+               width: dialog.width(),
+               left: dialog.offset().left
+            }, self._restore);
+            dialog.find(".dialog_button_restore").addClass("dialog_button_hide");
+            return this;
+        },
+
+        _extending: function(event) {
+            var self = this;
+            var wWidth = $(window).width() - 25;
+            var dialog = $(this).closest(".ui-dialog");
+            dialog.animate({
+                left: 0,
+                width: wWidth,
+                height: "auto" ,
+            }, 100);
+            var content = dialog.find(".ui-dialog-content");
+            content.width("auto");
+            content.height(event.data.max_height);
+            $(this).addClass('dialog_button_hide');
+            $(this).prev().removeClass('dialog_button_hide');
+        },
+
+        _restore: function(event) {
+            var self = this;
+            var dialog = $(this).closest(".ui-dialog");
+            dialog.animate({
+                left: event.data.left,
+                width: event.data.width,
+            }, 100);
+            var content = dialog.find(".ui-dialog-content");
+            content.width("auto");
+            content.height("auto");
+            $(this).addClass('dialog_button_hide');
+            $(this).next().removeClass('dialog_button_hide');
+        },
+
+    });
+
 };
 
 // vim:et fdc=0 fdl=0:
