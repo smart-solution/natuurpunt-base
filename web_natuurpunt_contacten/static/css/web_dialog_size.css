@@ -1,0 +1,14 @@
+.dialog_button_extend {
+  position:absolute;
+  left:95%
+}
+
+.dialog_button_restore {
+  position:absolute;
+  left:98%
+}
+
+.dialog_button_hide {
+    display: none;
+}
+
