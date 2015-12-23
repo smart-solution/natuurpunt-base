@@ -13,7 +13,7 @@ dialog resize
     'version': '1.0',
     'depends': [],
     'js': ['static/*/*.js', 'static/*/js/*.js'],
-    'css': ['static/*/*.css', 'static/*/css/*.css'],
+    'css': ['static/css/web_dialog_size.css'],
     'auto_install': False,
     'web_preload': False,
 }
