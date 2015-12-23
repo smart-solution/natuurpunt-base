@@ -38,6 +38,7 @@ openerp.web_natuurpunt_contacten = function(instance) {
     });
     instance.web.Dialog.include({
         open: function () {
+            this.dialog_options.width = 1900
             this._super();
             var self = this;
             this.$extendbutton = $('<a href="#" class="dialog_button_extend"><span class="ui-icon ui-icon-plusthick">+</span>');
