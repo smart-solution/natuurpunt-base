@@ -11,9 +11,8 @@ dialog resize
 
 """,
     'version': '1.0',
-    'depends': [],
+    'depends': ['web'],
     'js': ['static/src/js/base_web_natuurpunt_contacten.js'],
     'css': ['static/src/css/web_dialog_size.css'],
     'auto_install': False,
-    'web_preload': False,
 }
