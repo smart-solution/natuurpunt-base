@@ -429,6 +429,20 @@
             </field>
         </record>        
 
+        <record id="view_natuurpunt_mailing_partner_form2_options" model="ir.ui.view">
+            <field name="name">view.natuurpunt.mailing.partner.form2.options</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="natuurpunt_mailing.view_natuurpunt_mailing_partner_form2" />
+            <field name="arch" type="xml">
+                <field name="periodical_1_id" position="attributes">
+                     <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field>
+                <field name="periodical_2_id" position="attributes">
+                     <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field>
+            </field>
+        </record>
+
         <record id="view_organisation_partner_form_options" model="ir.ui.view">
             <field name="name">view.organisation.partner.form.options</field>
             <field name="model">res.partner</field>
