@@ -162,7 +162,7 @@ openerp.web_m2x_options = function (instance) {
                         action: function () {
                             dataset.name_search(
                                 search_val, self.build_domain(),
-                                'ilike', false).done(function (data) {
+                                'ilike', 160).done(function (data) {
                                     self._search_create_popup("search", data);
                                 });
                         },
@@ -297,7 +297,7 @@ openerp.web_m2x_options = function (instance) {
                     values.push({
                         label: _t("Search More..."),
                         action: function() {
-                            dataset.name_search(search_val, self.build_domain(), 'ilike', false).done(function(data) {
+                            dataset.name_search(search_val, self.build_domain(), 'ilike', 160).done(function(data) {
                                 self._search_create_popup("search", data);
                             });
                         },
