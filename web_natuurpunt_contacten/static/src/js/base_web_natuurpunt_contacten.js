@@ -10,6 +10,13 @@ openerp.web_natuurpunt_contacten = function(instance) {
 
    var account_number_format = function (value) {return value.replace(/[^\dA-Z]/g, '').replace(/(.{4})/g, '$1 ').trim()};
 
+   instance.web.search.CustomFilters.include({
+        append_filter: function(filter) {
+            this._super.apply(this,arguments);
+            // remove delete from public filters
+            this.$el.find("ul li.oe_searchview_custom_public a").unbind().empty();
+        },
+    });
    instance.web.SearchView.include({
         search_view_loaded: function(data) {
             var ret = this._super.apply(this, arguments);
