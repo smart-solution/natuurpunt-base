@@ -528,6 +528,38 @@
             </field>
         </record>
 
+        <record id="crossovered_budget_view_form_options" model="ir.ui.view">
+            <field name="name">crossovered.budget.view.form.options</field>
+            <field name="model">crossovered.budget</field>
+            <field name="inherit_id" ref="account_budget.crossovered_budget_view_form" />
+            <field name="arch" type="xml">
+                <xpath expr="//form/group/group/field[@name='analytic_account_id']" position="attributes">
+                      <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </xpath>
+                <xpath expr="//form/group/group/field[@name='general_budget_id']" position="attributes">
+                      <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="view_account_budget_detailline_form_options" model="ir.ui.view">
+            <field name="name">view.account.budget.detailline.form.options</field>
+            <field name="model">account.budget.detailline</field>
+            <field name="inherit_id" ref="account_budget_detailline.view_account_budget_detailline_form" />
+            <field name="arch" type="xml">
+                <field name="budget_id" position="attributes">
+                     <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field>
+                <field name="analytic_account_id" position="attributes">
+                     <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field>
+                <field name="position_id" position="attributes">
+                     <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field>
+            </field>
+        </record>
+        
+
     </data>
 </openerp>
 
