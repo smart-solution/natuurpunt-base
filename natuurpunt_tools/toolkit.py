@@ -22,6 +22,7 @@ import os
 import tempfile
 from lxml import etree, objectify
 from collections import Counter
+import difflib
 
 def sql_wrapper(sqlstat):
     def execute_sql(cr):
@@ -42,6 +43,17 @@ def sum_groupby(groupby_obj, keys_to_sum=None):
            c.update({k:dict[k] for k in keys_to_sum})
        res.append((key,c))
     return res
+
+def difflib_cmp(search_for, search_results, limit=1):
+    weighted_results = []
+    for result in search_results:
+        ratio = difflib.SequenceMatcher(None, result[1].lower(), search_for.lower()).ratio()
+        weighted_results.append((result[0], ratio))
+    res = sorted(weighted_results, key=lambda x: x[1], reverse=True)
+    if len(res) >= limit:
+        return res[0:limit]
+    else:
+        return res
 
 def create_node(tag, data, *sub_nodes):
     def create_element():
@@ -93,5 +105,42 @@ def transform(xml,xslt,data):
         silentremove(xml_template.name)
         silentremove(xslt_stylesheet.name)
         return etree.tostring(lom_tree, pretty_print=True)
+
+class AttrDict(dict):
+    """
+    A dictionary with attribute-style access. It maps attribute access to
+    the real dictionary.
+    """
+    def __init__(self, init={}):
+        dict.__init__(self, init)
+    def __getstate__(self):
+        return self.__dict__.items()
+    def __setstate__(self, items):
+        for key, val in items:
+            self.__dict__[key] = val
+    def __repr__(self):
+        return "%s(%s)" % (self.__class__.__name__, dict.__repr__(self))
+    def __setitem__(self, key, value):
+        return super(AttrDict, self).__setitem__(key, value)
+    def __getitem__(self, name):
+        return super(AttrDict, self).__getitem__(name)
+    def __delitem__(self, name):
+        return super(AttrDict, self).__delitem__(name)
+    __getattr__ = __getitem__
+    __setattr__ = __setitem__
+
+    def copy(self):
+        ch = AttrDict(self)
+        return ch
+    @classmethod
+    def create_empty(cls,*args, **kwargs):
+        return cls(dict((k, False) for k in args))
+    @classmethod
+    def create_empty_from_list(cls,list_arg):
+        return cls({k:False for k in list_arg})
+    @classmethod
+    def fill(cls,source,target):
+        if source:
+            [setattr(target,k,v) for k,v in source.iteritems() if hasattr(target,k)]
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

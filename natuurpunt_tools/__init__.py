@@ -26,4 +26,5 @@ from toolkit import sum_groupby
 from toolkit import create_node
 from toolkit import create_xml
 from toolkit import transform
-
+from toolkit import difflib_cmp
+from toolkit import AttrDict
