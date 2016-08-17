@@ -184,6 +184,15 @@
                 <field name="dimension_id" position="attributes">
                      <attribute name="options">{'create': false, 'create_edit': false}</attribute>
                 </field>
+                <field name="default_dimension_1_id" position="attributes">
+                     <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field>
+                <field name="default_dimension_2_id" position="attributes">
+                     <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field>
+                <field name="default_dimension_3_id" position="attributes">
+                     <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field>
             </field>
         </record>
 
@@ -527,7 +536,6 @@
                 </field>
             </field>
         </record>
-
     </data>
 </openerp>
 
