@@ -415,6 +415,9 @@
                 <field name="associate_member" position="attributes">
                       <attribute name="options">{'create': false, 'create_edit': false}</attribute>
                 </field>
+                <field name="recruiting_member_id" position="attributes">
+                      <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field>
             </field>
         </record>
 
