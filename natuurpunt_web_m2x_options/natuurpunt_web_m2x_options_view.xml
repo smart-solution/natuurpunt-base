@@ -415,6 +415,20 @@
                 <field name="associate_member" position="attributes">
                       <attribute name="options">{'create': false, 'create_edit': false}</attribute>
                 </field>
+                <field name="recruiting_member_id" position="attributes">
+                      <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field>
+            </field>
+        </record>
+
+        <record id="view_natuurpunt_crm_partner_form_options2" model="ir.ui.view">
+            <field name="name">view.natuurpunt.crm.partner.form.options2</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="natuurpunt_crm_fixes.view_natuurpunt_crm_partner_form" />
+            <field name="arch" type="xml">
+                <field name="recruiting_organisation_id" position="attributes">
+                     <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field>
             </field>
         </record>
 
