@@ -55,6 +55,19 @@ def difflib_cmp(search_for, search_results, limit=1):
     else:
         return res
 
+def uids_in_group(obj, cr, uid, group, partner=False, context=None):
+    mod_obj = obj.pool.get('ir.model.data')
+    model_data_ids = mod_obj.search(cr, uid,[('model', '=', 'res.groups'), ('name', '=', group)], context=context)
+    res_id = mod_obj.read(cr, uid, model_data_ids, fields=['res_id'], context=context)[0]['res_id']
+    if res_id:
+        group_obj = obj.pool.get('res.groups').browse(cr, uid, res_id)
+        if partner:
+            return [user.partner_id.id for user in group_obj.users]
+        else:
+            return [user.id for user in group_obj.users]
+    else:
+        return []
+
 def create_node(tag, data, *sub_nodes):
     def create_element():
         obj = objectify.Element(tag)
