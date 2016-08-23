@@ -28,3 +28,4 @@ from toolkit import create_xml
 from toolkit import transform
 from toolkit import difflib_cmp
 from toolkit import AttrDict
+from toolkit import uids_in_group
