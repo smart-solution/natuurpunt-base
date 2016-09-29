@@ -132,7 +132,6 @@ class ir_attachment(osv.osv):
                         if vals['res_model'] == 'account.invoice':
                             name = ressource.internal_number or ressource.number or str(ressource.id)
 
-                        print "RES NAME:",name
 
                         query = """ 
                             select cmis:objectId, cmis:name
@@ -140,7 +139,6 @@ class ir_attachment(osv.osv):
                             where in_folder('%s') and cmis:name = '%s'
                             order by cmis:lastModificationDate desc
                             """ % (cmisDir,name)
-                        print "QUERY:",query
                         childrenRS = repo.query(query)
                         children = childrenRS.getResults()
 
