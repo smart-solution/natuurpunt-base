@@ -23,6 +23,7 @@ import tempfile
 from lxml import etree, objectify
 from collections import Counter
 import difflib
+from unidecode import unidecode
 
 def sql_wrapper(sqlstat):
     def execute_sql(cr):
@@ -44,10 +45,19 @@ def sum_groupby(groupby_obj, keys_to_sum=None):
        res.append((key,c))
     return res
 
+def make_unicode(input):
+    if type(input) != unicode:
+        input =  input.decode('utf-8')
+        return input
+    else:
+        return input
+
 def difflib_cmp(search_for, search_results, limit=1):
     weighted_results = []
+    b = unidecode(search_for.lower())
     for result in search_results:
-        ratio = difflib.SequenceMatcher(None, result[1].lower(), search_for.lower()).ratio()
+        a = unidecode(result[1].lower())
+        ratio = difflib.SequenceMatcher(None, make_unicode(a), make_unicode(b)).ratio()
         weighted_results.append((result[0], ratio))
     res = sorted(weighted_results, key=lambda x: x[1], reverse=True)
     if len(res) >= limit:
