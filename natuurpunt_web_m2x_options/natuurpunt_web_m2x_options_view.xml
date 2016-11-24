@@ -550,6 +550,29 @@
                 </field>
             </field>
         </record>
+        
+        <record id="view_natuurpunt_project_form_options" model="ir.ui.view">
+            <field name="name">view.natuurpunt.project.form.options</field>
+            <field name="model">project.project</field>
+            <field name="inherit_id" ref="natuurpunt_projects.view_natuurpunt_project_form" />
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='user_id']" position="attributes">
+                      <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </xpath>
+                <field name="partner_id" position="attributes">
+                     <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field>
+                <field name="seq" position="attributes">
+                     <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field>
+                <field name="contact_id" position="attributes">
+                     <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field>
+                <field name="main_contractor_id" position="attributes">
+                     <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field>
+            </field>
+        </record>
     </data>
 </openerp>
 
