@@ -10,6 +10,22 @@ openerp.web_natuurpunt_contacten = function(instance) {
 
    var account_number_format = function (value) {return value.replace(/[^\dA-Z]/g, '').replace(/(.{4})/g, '$1 ').trim()};
 
+   instance.web.form.NatuurpuntAttachments = instance.web.form.FieldChar.extend({
+       template: "NatuurpuntAttachments",
+       init: function (view, code) {
+           this._super.apply(this,arguments);
+       },
+       start: function() {
+           this._super();
+           System.import('app/main')
+               .then((module) => { module.main(instance); })
+               .catch(function(err){ console.error(err); });
+           console.log("app loaded " + instance);
+       }
+   });
+   instance.web.form.widgets.add('natuurpunt_attachments', 'instance.web.form.NatuurpuntAttachments');
+   
+
    instance.web.search.CustomFilters.include({
         append_filter: function(filter) {
             this._super.apply(this,arguments);

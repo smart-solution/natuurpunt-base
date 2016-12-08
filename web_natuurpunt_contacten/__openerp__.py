@@ -12,7 +12,17 @@ dialog resize
 """,
     'version': '1.0',
     'depends': ['web'],
-    'js': ['static/src/js/base_web_natuurpunt_contacten.js'],
-    'css': ['static/src/css/web_dialog_size.css'],
+    'js': [
+        'static/lib/node_modules/core-js/client/shim.min.js',
+        'static/lib/node_modules/zone.js/dist/zone.js',
+        'static/lib/node_modules/reflect-metadata/Reflect.js',
+        'static/lib/node_modules/systemjs/dist/system.src.js',
+        'static/src/js/systemjs.config.js',
+
+        'static/src/js/base_web_natuurpunt_contacten.js'],
+
+    'css': ['static/src/css/web_dialog_size.css',
+            'static/src/css/font-awesome.min.css'],
+    'qweb': ['static/src/xml/uploader_template.xml'],
     'auto_install': False,
 }
