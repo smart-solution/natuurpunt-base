@@ -573,6 +573,17 @@
                 </field>
             </field>
         </record>
+        
+        <record id="view_res_partner_inactive_form_options" model="ir.ui.view">
+            <field name="name">res.partner.inactive.form.options</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="partner_inactive.view_res_partner_inactive_form" />
+            <field name="arch" type="xml">
+                <field name="inactive_id" position="attributes">
+                     <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field>
+            </field>
+        </record>  
     </data>
 </openerp>
 
