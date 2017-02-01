@@ -25,9 +25,11 @@ from collections import Counter
 import difflib
 from unidecode import unidecode
 
-def sql_wrapper(sqlstat):
+def sql_wrapper(sqlstat, method=None):
     def execute_sql(cr):
         cr.execute(sqlstat)
+        if method and method == 'dictfetchone':
+            return cr.dictfetchone()
         return cr.dictfetchall()
     return execute_sql
 
