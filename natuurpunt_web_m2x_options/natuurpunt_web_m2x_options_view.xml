@@ -95,6 +95,17 @@
                 </xpath>
             </field>
     </record>
+    
+    <record id="view_create_payment_order_np_options" model="ir.ui.view">
+            <field name="name">view.create.payment.order.np.options</field>
+            <field name="model">payment.order.create</field>
+            <field name="inherit_id" ref="multi_analytical_account.view_create_payment_order_np" />
+            <field name="arch" type="xml">
+                <field name="partner_id" position="attributes">
+                     <attribute name="options">{'limit': 10, 'create': false, 'create_edit': false}</attribute>
+                </field>
+            </field>
+    </record>
 
     <record id="account_invoice_tree_acespritech_inherit_options" model="ir.ui.view">
             <field name="name">account.invoice.tree.acespritech.inherit.options</field>
