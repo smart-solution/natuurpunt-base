@@ -11,6 +11,7 @@ openerp.web_m2x_options = function (instance) {
     var OPTIONS = ['web_m2x_options.create',
                    'web_m2x_options.create_edit',
                    'web_m2x_options.limit',
+                   'web_m2x_options.custom_warn',
                    'web_m2x_options.search_more',
                    'web_m2x_options.m2o_dialog',];
 
@@ -51,6 +52,15 @@ openerp.web_m2x_options = function (instance) {
                 return option
             }
             return false
+        },
+
+        is_false: function() {
+            if (!(this.is_option_set(this.options.custom_warn)) || _.isUndefined(this.options.custom_warn)) {
+                return ! this.get("value")
+            }
+            else {
+                return false
+            }
         },
 
         show_error_displayer: function () {

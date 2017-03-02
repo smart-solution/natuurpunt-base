@@ -15,6 +15,7 @@ Add new options for many2one and many2manytags field:
 - search_more: true/false -> force disable/enable search more button.
 - field_color -> define the field used to define color.
 - colors -> link field values to a HTML color.
+- custom_warn -> disable client required notification type=bool
 
 
 Example:
