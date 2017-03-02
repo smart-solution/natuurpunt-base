@@ -95,6 +95,23 @@
                 </xpath>
             </field>
     </record>
+
+    <record model="ir.ui.view" id="account_bank_statement_tree_acespritech_inherit_options">
+        <field name="name">account.bank.statement.tree.acespritech.inherit.options</field>
+        <field name="model">account.bank.statement</field>
+        <field name="inherit_id" ref="multi_analytical_account.account_bank_statement_tree_acespritech_inherit" />
+        <field name="arch" type="xml">
+             <field name="analytic_dimension_1_id" position="attributes">
+                   <attribute name="options">{'limit': 10, 'create': false, 'create_edit': false, 'custom_warn': true}</attribute>
+             </field>
+             <field name="analytic_dimension_2_id" position="attributes">
+                   <attribute name="options">{'limit': 10, 'create': false, 'create_edit': false, 'custom_warn': true}</attribute>
+             </field>
+             <field name="analytic_dimension_3_id" position="attributes">
+                   <attribute name="options">{'limit': 10, 'create': false, 'create_edit': false, 'custom_warn': true}</attribute>
+             </field>
+        </field>
+    </record>
     
     <record id="view_create_payment_order_np_options" model="ir.ui.view">
             <field name="name">view.create.payment.order.np.options</field>
