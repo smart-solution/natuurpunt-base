@@ -25,9 +25,11 @@ from collections import Counter
 import difflib
 from unidecode import unidecode
 
-def sql_wrapper(sqlstat):
+def sql_wrapper(sqlstat, method=None):
     def execute_sql(cr):
         cr.execute(sqlstat)
+        if method and method == 'dictfetchone':
+            return cr.dictfetchone()
         return cr.dictfetchall()
     return execute_sql
 
@@ -64,6 +66,86 @@ def difflib_cmp(search_for, search_results, limit=1):
         return res[0:limit]
     else:
         return res
+
+def get_match_vals(vals):
+    """
+    subset of fields needed to match
+    """
+    match_fields = ['first_name','last_name']
+    ref = AttrDict()
+    [setattr(ref,k,v) for k,v in vals.iteritems() if k in match_fields]
+    return ref
+
+def match_with_existing_partner(obj,cr,uid,data):
+    """
+    when we could not find a partner by its unique identifier = email
+    we do an extra check if we can find it based on address and name
+    """
+
+    vals, logger, alert = data
+
+    def concat_names(p):
+        try:
+            return p.first_name + '_' + p.last_name
+        except:
+            return ''
+
+    def match_on_fullname(target_ids):
+        match_target_list = []
+        for partner in obj.browse(cr,uid,target_ids):
+            match_target_list.append((partner.id, concat_names(partner)))
+        return difflib_cmp(concat_names(ref_vals), match_target_list)[0] if match_target_list else False
+
+    def match_names_seperatly(cmp_res):
+        """
+        return tuple partner object,boolean full match
+        """
+        logger.info("partner fullname match diff:{}".format(cmp_res))
+        if cmp_res:
+            partner = obj.browse(cr,uid,cmp_res[0])
+            if cmp_res[1] == 1.0:
+                return (partner,True)
+            if cmp_res[1] > 0.5:
+                first_name = partner.first_name if partner.first_name else ''
+                cmp_res_first_name = difflib_cmp(ref_vals.first_name, [(partner.id, first_name)])[0]
+                last_name =  partner.last_name if partner.last_name else ''
+                cmp_res_last_name = difflib_cmp(ref_vals.last_name, [(partner.id, last_name)])[0]
+                logger.info("partner firstname match diff:{}".format(cmp_res_first_name))
+                logger.info("partner lastname match diff:{}".format(cmp_res_last_name))
+                # rules, priority full match to less match
+                rules = [lambda f,l : f == 0 and l == 1.0,    # no firstname, 100% lastname
+                         lambda f,l : f >= 0.7 and l >= 0.85] # seperate firstname/lastname
+                res = [func(cmp_res_first_name[1],cmp_res_last_name[1]) for func in rules]
+                # return partner,full match or partial match
+                return (partner,res[0]) if any(res) else (False,False)
+            else:
+                return (False,False)
+        else:
+            return (False,False)
+
+    ref_vals = get_match_vals(vals)
+    if 'street_id' in vals and vals['street_id']:
+       target_domain = [
+            ('street_id','=',vals['street_id']),
+            ('zip_id','=',vals['zip_id']),
+            ('street_nbr','=',vals['street_nbr']),
+       ]
+    else:
+       target_domain = [
+            ('street','=',vals['street']),
+            ('zip','=',vals['zip']),
+            ('street_nbr','=',vals['street_nbr']),
+       ]
+    partner = compose(
+                match_on_fullname,
+                match_names_seperatly,
+                lambda (p,full_match): p if p and (not(p.donation_line_ids) or full_match) else False
+              )(obj.search(cr,uid,target_domain))
+    log = {
+        'alert':[alert] if partner else [],
+        'renewal':False
+    }
+    return (partner if partner else False, vals, log)
 
 def uids_in_group(obj, cr, uid, group, partner=False, context=None):
     mod_obj = obj.pool.get('ir.model.data')

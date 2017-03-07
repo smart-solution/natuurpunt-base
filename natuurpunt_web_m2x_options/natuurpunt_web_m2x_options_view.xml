@@ -96,6 +96,34 @@
             </field>
     </record>
 
+    <record model="ir.ui.view" id="account_bank_statement_tree_acespritech_inherit_options">
+        <field name="name">account.bank.statement.tree.acespritech.inherit.options</field>
+        <field name="model">account.bank.statement</field>
+        <field name="inherit_id" ref="multi_analytical_account.account_bank_statement_tree_acespritech_inherit" />
+        <field name="arch" type="xml">
+             <field name="analytic_dimension_1_id" position="attributes">
+                   <attribute name="options">{'limit': 10, 'create': false, 'create_edit': false, 'custom_warn': true}</attribute>
+             </field>
+             <field name="analytic_dimension_2_id" position="attributes">
+                   <attribute name="options">{'limit': 10, 'create': false, 'create_edit': false, 'custom_warn': true}</attribute>
+             </field>
+             <field name="analytic_dimension_3_id" position="attributes">
+                   <attribute name="options">{'limit': 10, 'create': false, 'create_edit': false, 'custom_warn': true}</attribute>
+             </field>
+        </field>
+    </record>
+    
+    <record id="view_create_payment_order_np_options" model="ir.ui.view">
+            <field name="name">view.create.payment.order.np.options</field>
+            <field name="model">payment.order.create</field>
+            <field name="inherit_id" ref="multi_analytical_account.view_create_payment_order_np" />
+            <field name="arch" type="xml">
+                <field name="partner_id" position="attributes">
+                     <attribute name="options">{'limit': 10, 'create': false, 'create_edit': false}</attribute>
+                </field>
+            </field>
+    </record>
+
     <record id="account_invoice_tree_acespritech_inherit_options" model="ir.ui.view">
             <field name="name">account.invoice.tree.acespritech.inherit.options</field>
             <field name="model">account.invoice</field>
@@ -550,6 +578,40 @@
                 </field>
             </field>
         </record>
+        
+        <record id="view_natuurpunt_project_form_options" model="ir.ui.view">
+            <field name="name">view.natuurpunt.project.form.options</field>
+            <field name="model">project.project</field>
+            <field name="inherit_id" ref="natuurpunt_projects.view_natuurpunt_project_form" />
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='user_id']" position="attributes">
+                      <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </xpath>
+                <field name="partner_id" position="attributes">
+                     <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field>
+                <field name="seq" position="attributes">
+                     <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field>
+                <field name="contact_id" position="attributes">
+                     <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field>
+                <field name="main_contractor_id" position="attributes">
+                     <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field>
+            </field>
+        </record>
+        
+        <record id="view_res_partner_inactive_form_options" model="ir.ui.view">
+            <field name="name">res.partner.inactive.form.options</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="partner_inactive.view_res_partner_inactive_form" />
+            <field name="arch" type="xml">
+                <field name="inactive_id" position="attributes">
+                     <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field>
+            </field>
+        </record>  
     </data>
 </openerp>
 
