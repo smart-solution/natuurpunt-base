@@ -28,3 +28,4 @@ from toolkit import create_xml
 from toolkit import transform
 from toolkit import uids_in_group
 from toolkit import match_with_existing_partner
+from toolkit import get_approval_state
