@@ -6,11 +6,15 @@ var packages = {
 
 // Tell Angular how normalize path and package aliases.
  var map = {
+     'rxjs/observable/fromPromise': 'npm:rxjs/bundles/Rx.js',
+     'rxjs/operator/toPromise': 'npm:rxjs/bundles/Rx.js',
      '@angular/core': 'npm:@angular/core/bundles/core.umd.js',
      '@angular/common': 'npm:@angular/common/bundles/common.umd.js',
      '@angular/compiler': 'npm:@angular/compiler/bundles/compiler.umd.js',
      '@angular/platform-browser': 'npm:@angular/platform-browser/bundles/platform-browser.umd.js',
      '@angular/platform-browser-dynamic': 'npm:@angular/platform-browser-dynamic/bundles/platform-browser-dynamic.umd.js',
+     '@angular/forms': 'npm:@angular/forms/bundles/forms.umd.min.js',
+     '@angular/http': 'npm:@angular/http/bundles/http.umd.min.js',
      'angular2-in-memory-web-api': 'npm:angular2-in-memory-web-api',
      'rxjs/Observable': 'npm:rxjs/bundles/Rx.min.js',
 	 'rxjs/BehaviorSubject': 'npm:rxjs/bundles/Rx.min.js',
@@ -19,6 +23,7 @@ var packages = {
      'rxjs/add/operator/mergeMap': 'npm:rxjs/bundles/Rx.min.js',
      'rxjs/add/observable/from': 'npm:rxjs/bundles/Rx.min.js',
 	 'rxjs/add/observable/of': 'npm:rxjs/bundles/Rx.min.js',
+	 'rxjs/add/observable/forkJoin': 'npm:rxjs/bundles/Rx.min.js',
      'rxjs': 'npm:rxjs/bundles/Rx.min',
 
 	 //"rxjs": "npm:rxjs/bundles/Rx.min",
@@ -46,6 +51,7 @@ var config = {
   paths: {
 	"npm:": "web_natuurpunt_contacten/static/lib/node_modules/",
     "app/*":"./web_natuurpunt_contacten/static/src/js/app/*.js",
+	"app.alfresco.dropoff/*":"./web_natuurpunt_contacten/static/src/js/app.alfresco.dropoff/*.js",
   },
   map: map,
   packages: packages
