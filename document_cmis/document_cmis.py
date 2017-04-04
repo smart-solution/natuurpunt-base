@@ -56,7 +56,6 @@ def setup_alfresco_rest_api(obj, cr, uid):
 
 def alfresco_repository_from_model(obj, cr, uid, vals, context=None):
     """"""
-    dir_found = False
     if 'res_model' in vals and vals['res_model']:
         #Find ressource directories
         model_id = obj.pool.get('ir.model').search(cr, uid, [('model','=',vals['res_model'])])[0]
@@ -76,13 +75,13 @@ def alfresco_repository_from_model(obj, cr, uid, vals, context=None):
                 if not res_ids:
                     continue
 
-                dir_found = True
-
                 # Check if the directory is company specific
                 if ressource.company_id != directory.company_id and directory.company_id:
                     raise osv.except_osv(_("Error!"),_("You cannot attach a document from the company %s in a directory from the company %s"%(ressource.company_id.name,directory.company_id.name)))
 
-    return (ressource,directory) if dir_found else (False,False)
+                return (ressource,directory)
+
+    return (False,False)
 
 @contextmanager
 def alfresco_api_handler(obj, cr, uid):
