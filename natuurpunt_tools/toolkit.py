@@ -176,7 +176,8 @@ def uids_in_group(obj, cr, uid, group, partner=False, context=None):
 def get_approval_state(obj, cr, uid, inv, context = None):
     mod_obj = obj.pool.get('purchase.approval.item')
     mod_ids = mod_obj.search(cr, uid,[('invoice_id', '=', inv.id)], context=context)
-    state = mod_obj.read(cr, uid, mod_ids, fields=['state'], context=context)[0]['state']
+    res = mod_obj.read(cr, uid, mod_ids, fields=['state'], context=context)
+    state = res[0]['state'] if res else False
     return state
 
 def create_node(tag, data, *sub_nodes):
