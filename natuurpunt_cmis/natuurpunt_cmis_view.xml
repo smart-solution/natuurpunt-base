@@ -18,7 +18,7 @@
         </record>
 
         <act_window id="action_natuurpunt_cmis_link_invoice"
-   	        name="Search for CMIS Documents 5"
+   	        name="Search for CMIS Documents"
 	        src_model="account.invoice"
             res_model="memory.cmis.dropoff" 
             view_mode="form" 
