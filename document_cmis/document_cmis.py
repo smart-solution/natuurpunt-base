@@ -22,33 +22,171 @@
 from osv import osv, fields
 from tools.translate import _
 from datetime import datetime
-from cmislib.model import CmisClient, Repository
-import io
 import base64
 import tempfile
 import logging
+from contextlib import contextmanager
+import requests
+import nodes
+import json
+from natuurpunt_tools import compose
+from functools import partial
+
 _logger = logging.getLogger(__name__)
-from openerp import pooler
-import gc
-import resource
 
-def using(point=""):
-    usage=resource.getrusage(resource.RUSAGE_SELF)
-    return '''%s: usertime=%s systime=%s mem=%s mb'''%(point,usage[0],usage[1], (usage[2]*resource.getpagesize())/1000000.0 )
-                
-def cmis_connect(cr, uid):
-    """Connect to the CMIS Server and returns the document repository"""
-    user = pooler.get_pool(cr.dbname).get('res.users').browse(cr, uid, uid)
-    server_url = pooler.get_pool(cr.dbname).get('ir.config_parameter').get_param(cr, uid, 'document_cmis.server_url')
-
+def setup_alfresco_rest_api(obj, cr, uid):
+    conf_param_obj = obj.pool.get('ir.config_parameter')
+    server_url = conf_param_obj.get_param(cr, uid, 'document_cmis.rest_api')
     if not server_url:
-        raise osv.except_osv(_('Error!'),_("Cannot connect to the CMIS Server: No CMIS Server URL system property found"))
+       raise osv.except_osv(_('Error!'),_("Cannot connect to the CMIS Server: No CMIS Server URL system property found"))
 
-    client = CmisClient(server_url, user.login, user.password)
-    repo = client.getDefaultRepository()
+    # basic auth credentials
+    user = obj.pool.get('res.users').browse(cr, uid, uid)
+    auth = (user.login, user.password)
 
-    return repo
+    def api_call_wrapper(verb,rest_api_call,files=None,data=None):
+        url = server_url + rest_api_call
+        if files:
+            response = requests.request(verb,url=url,files=files,auth=auth)
+        else:
+            response = requests.request(verb,url=url,data=data,auth=auth)
+        response.raise_for_status()
+        return response
+    return api_call_wrapper
 
+def alfresco_repository_from_model(obj, cr, uid, vals, context=None):
+    """"""
+    if 'res_model' in vals and vals['res_model']:
+        #Find ressource directories
+        model_id = obj.pool.get('ir.model').search(cr, uid, [('model','=',vals['res_model'])])[0]
+        dirs = obj.pool.get('document.directory').search(cr, uid, [('ressource_type_id','=',model_id)])
+        ressource = obj.pool.get(vals['res_model']).browse(cr, uid, vals['res_id'])
+        server_mode = obj.pool.get('ir.config_parameter').get_param(cr, uid, 'document_cmis.server_mode')
+        if not dirs and server_mode == 'cmis_only':
+            raise osv.except_osv(_("Error!"),_("You cannot add attachments to this record"))
+
+        for directory in obj.pool.get('document.directory').browse(cr, uid, dirs):
+            # Process only for CMIS enabled directories
+            if directory.cmis_object_id:
+
+                # Check the directory domain
+                domain = [('id','=',vals['res_id'])] + eval(directory.domain)
+                res_ids = obj.pool.get(vals['res_model']).search(cr, uid, domain)
+                if not res_ids:
+                    continue
+
+                # Check if the directory is company specific
+                if ressource.company_id != directory.company_id and directory.company_id:
+                    raise osv.except_osv(_("Error!"),_("You cannot attach a document from the company %s in a directory from the company %s"%(ressource.company_id.name,directory.company_id.name)))
+
+                return (ressource,directory)
+
+    return (False,False)
+
+@contextmanager
+def alfresco_api_handler(obj, cr, uid):
+    try:
+        alfresco_rest_api = setup_alfresco_rest_api(obj, cr, uid)
+        yield alfresco_rest_api
+    except requests.exceptions.Timeout:
+        # Maybe set up for a retry, or continue in a retry loop
+        raise osv.except_osv(_("Error!"),_("CMIS Server: Timeout"))
+    except requests.exceptions.TooManyRedirects:
+        # Tell the user their URL was bad and try a different one
+        raise osv.except_osv(_("Error!"),_("CMIS Server: Too many redirects"))
+    except requests.exceptions.RequestException as err:
+        _logger.exception(err)
+        raise osv.except_osv(_("Request Error!"),_(err))
+    except requests.exceptions.HTTPError as err:
+        _logger.exception(err)
+        raise osv.except_osv(_("HTTPError!"),_(err))
+
+def attach_document_from_dropoff_folder(api,vals):
+    return compose(partial(check_root_folder,api),
+                   partial(get_target_folder,api),
+                   partial(move_from_dropoff_folder_to_target_folder,api))(vals)
+
+def attach_document_from_disk(api,vals):
+    return compose(partial(check_root_folder,api),
+                   partial(get_target_folder,api),
+                   partial(upload_file_from_disk,api))(vals)
+
+def rename_draft_invoice_folder(api,vals):
+    return compose(partial(check_root_folder,api),
+                   partial(rename_draft_folder_to_target_folder,api))(vals)
+
+def check_root_folder(api,vals):
+    # check if directory exists on cmis server
+    response = api('GET',nodes.node(vals['cmis_object_id']))
+    return vals
+
+def get_target_folder(api,vals):
+    response = api('GET',nodes.queries(vals['cmis_object_id'],vals['target_folder']))
+    query_res = [entry['entry'] for entry in response.json()['list']['entries']]
+    if not(any([r['isFolder'] for r in query_res]) if query_res else False):
+       folder = {"nodeType":"cm:folder"}
+       folder['name'] = vals['target_folder']
+       request_body = json.dumps(folder)
+       response = api('POST',nodes.children(vals['cmis_object_id']),data=request_body)
+       vals['target_folder_id'] = response.json()['entry']['id']
+    else:
+       vals['target_folder_id'] = [r['id'] for r in query_res if r['isFolder']][0]
+    return vals
+
+def rename_draft_folder_to_target_folder(api,vals):
+    response = api('GET',nodes.queries(vals['cmis_object_id'],vals['draft_folder']))
+    query_res = [entry['entry'] for entry in response.json()['list']['entries']]
+    if any([r['isFolder'] for r in query_res]) if query_res else False:
+       vals['draft_folder_id'] = [r['id'] for r in query_res if r['isFolder']][0]
+       request_body = json.dumps({'name':vals['target_folder']})
+       response = api('PUT',nodes.node(vals['draft_folder_id']),data=request_body)
+    return response
+
+def move_from_dropoff_folder_to_target_folder(api,vals):
+    request_body = json.dumps({'targetParentId':vals['target_folder_id']})
+    response = api('POST',nodes.move(vals['object_id']),data=request_body)
+    return response
+
+def upload_file_from_disk(api,vals):
+    fname = vals['datas_fname']
+    extension =  fname.split(".")
+    # Keep the last extension (for .tar.gz it will be .gz)
+    # If not extension found, set as txt
+    extension = ".txt" if len(extension) == 1 else "." + extension[-1]
+    fp = tempfile.NamedTemporaryFile(delete=False, suffix=extension)
+    fp.write(base64.decodestring(vals['datas']))
+    fp.write(vals['datas'])
+    fp.close()
+    node = nodes.children(vals['target_folder_id'])
+    # automatic closing of file 
+    with open(fp.name, 'r') as fdata:
+       response = api('POST',node,files={'filedata': fdata})
+    #renaming it to the original name
+    object_id = response.json()['entry']['id']
+    node_rename = nodes.node(object_id)
+    request_body = json.dumps({'name':fname})
+    response = api('PUT',node_rename,data=request_body)
+    return response
+
+class account_invoice(osv.osv):
+
+    _inherit = "account.invoice"
+
+    def invoice_validate(self, cr, uid, ids, context=None):
+        res =  super(account_invoice, self).invoice_validate(cr, uid, ids, context=context)
+        for invoice in self.browse(cr, uid, ids):
+            if self.pool.get('ir.attachment').search(cr, uid, [('res_id','=',invoice.id)]):
+                vals = {'res_model':'account.invoice', 'res_id':invoice.id}
+                ressource, directory = alfresco_repository_from_model(self, cr, uid, vals, context=context)
+                if directory.cmis_object_id:
+                    cmis_vals = {
+                        'cmis_object_id':directory.cmis_object_id.split('/')[-1],
+                        'draft_folder':invoice.id,
+                        'target_folder':invoice.internal_number,
+                    }
+                    with alfresco_api_handler(self, cr, uid) as api:
+                        response = rename_draft_invoice_folder(api,cmis_vals)
+        return res
 
 class ir_attachment(osv.osv):
 
@@ -74,161 +212,67 @@ class ir_attachment(osv.osv):
         'datas': fields.function(_data_get, fnct_inv=_data_set, string='File Content', type="binary", nodrop=True),
     }
 
-
     def create(self, cr, uid, vals, context=None):
         """Send the document to the CMIS server and create the attachment"""
 
-        if 'res_model' in vals and vals['res_model']:
-            #Find ressource directories
-            model_id = self.pool.get('ir.model').search(cr, uid, [('model','=',vals['res_model'])])[0]
-            dirs = self.pool.get('document.directory').search(cr, uid, [('ressource_type_id','=',model_id)])
-            ressource = self.pool.get(vals['res_model']).browse(cr, uid, vals['res_id'])
-            server_mode = self.pool.get('ir.config_parameter').get_param(cr, uid, 'document_cmis.server_mode')
-            if not dirs and server_mode == 'cmis_only':
-                raise osv.except_osv(_("Error!"),_("You cannot add attachments to this record"))
+        ressource, directory = alfresco_repository_from_model(self, cr, uid, vals, context=context)
 
-            dir_found = False
+        # For Static directories, of a CMIS Object ID is specified, it put all files in that directory (IOW, it does not create subdirs)
+        # For Folders per ressources, search if the ressource directory exists or creates it
+        if directory and directory.type == "ressource":
 
-            for directory in self.pool.get('document.directory').browse(cr, uid, dirs):
-                # Process only for CMIS enabled directories
-                if directory.cmis_object_id:    
+           vals['cmis_object_id'] = directory.cmis_object_id.split('/')[-1]
+           cmis_vals = vals.copy()
 
-                    # Check the directory domain
-                    domain = [('id','=',vals['res_id'])] + eval(directory.domain)
-                    res_ids = self.pool.get(vals['res_model']).search(cr, uid, domain)
-                    if not res_ids:
-                        continue
+           # Check which field to use to find the name
+           if directory.resource_field:
+              name_field = directory.resource_field.name
+              name = str(getattr(ressource, name_field))
+           else:
+              name = str(ressource.name)
+           if vals['res_model'] == 'account.invoice':
+              name = ressource.internal_number or ressource.number or str(ressource.id)
 
-                    dir_found = True    
-            
-                    # Check if the directory is company specific
-                    if ressource.company_id != directory.company_id and directory.company_id:
-                        raise osv.except_osv(_("Error!"),_("You cannot attach a document from the company %s in a directory from the company %s"%(ressource.company_id.name,directory.company_id.name)))
+           # If no name is found
+           if name:
+              name = str(name).replace('/','_')
+              cmis_vals['target_folder'] = name
+           else:
+              raise osv.except_osv(_('Error!'),_("Cannot find a document name for this ressource (model:%s / id:%s)"%(vals['res_model'],vals['res_id'])))
 
-                    repo = cmis_connect(cr, uid)
-                    if not repo:
-                        raise osv.except_osv(_('Error!'),_("Cannot find the default repository in the CMIS Server."))
+           # check if document is already exsists with this model/res_id
+           if self.search(cr, uid, [('name','=',vals['name']),('res_id','=',vals['res_id'])]):
+              raise osv.except_osv(_("Error!"),_("A document already exists with the same name for this ressource (model:%s / id:%s)"%(vals['res_model'],vals['res_id'])))
 
-                    # Find the CMIS directory
-                    try:
-                        cmisDir = repo.getObject(directory.cmis_object_id)
-                    except:
-                        raise osv.except_osv(_('Error!'),_("Cannot find this directory (%s) in the DMS. You may not have the right to access it."%(directory.name)))
+           with alfresco_api_handler(self, cr, uid) as api:
+              if 'object_id' in cmis_vals:
+                  response = attach_document_from_dropoff_folder(api,cmis_vals)
+              else:
+                  response = attach_document_from_disk(api,cmis_vals)
 
-                    if not cmisDir:
-                        raise osv.except_osv(_('Error!'),_("Cannot find the directory %s in the CMIS Server: %s"%(directory.name)))
+           #Get the cmis object id and store it in the attachment
+           protocol = 'workspace://SpacesStore/'
+           link_url = self.pool.get('ir.config_parameter').get_param(cr, uid, 'document_cmis.server_link_url')
+           url = link_url + protocol + response.json()['entry']['id']
+           vals['type'] = 'url'
+           vals['url'] = url
+           vals['cmis_object_id'] = protocol + response.json()['entry']['id']
+           vals['db_datas'] = ""
 
-                    # For Static directories, of a CMIS Object ID is specified, it put all files in that directory (IOW, it does not create subdirs)
-                    # For Folders per ressources, search if the ressource directory exists or creates it
-                    if directory.type == "ressource":
-
-                        # Check which field to use to find the name
-                        if directory.resource_field:
-                            name_field = directory.resource_field.name
-                            name = str(getattr(ressource, name_field))
-                        else:
-                            name = str(ressource.name)
-
-                        if vals['res_model'] == 'account.invoice':
-                            name = ressource.internal_number or ressource.number or str(ressource.id)
-
-
-                        query = """ 
-                            select cmis:objectId, cmis:name
-                            from cmis:folder
-                            where in_folder('%s') and cmis:name = '%s'
-                            order by cmis:lastModificationDate desc
-                            """ % (cmisDir,name)
-                        childrenRS = repo.query(query)
-                        children = childrenRS.getResults()
-
-                        res_found = False
-
-                        # If no name is found
-                        if not name:
-                            raise osv.except_osv(_('Error!'),_("Cannot find a document name for this ressource (model:%s / id:%s)"%(vals['res_model'],vals['res_id'])))
-
-                        name = str(name).replace('/','_')
-
-                        # Check if the folder already exists
-                        for child in children:
-                            if name == child.properties['cmis:name']:
-                                # Use the ressource folder
-                                cmisDir = repo.getObject(child.properties['cmis:objectId'])
-                                res_found = True
-                        if not res_found:
-                            # Create the ressouce folder
-                            try:
-                                cmisDir = repo.createFolder(cmisDir, name)
-                            except:
-                                raise osv.except_osv(_('Error!'),_("You cannot add that document in the CMIS Server."))
-                            
-
-                    # Create the temporary file
-                    # NiceToHave: Create temp file for big files (>1Go) and in memory for smaller ones
-                    fname = vals['datas_fname']
-                    extension =  fname.split(".")
-                    # Keep the last extension (for .tar.gz it will be .gz)
-                    if len(extension) == 1:
-                        # If not extension found, set as txt
-                        extension = ".txt"
-                    else:
-                        extension = "." + extension[-1]
-
-                    # Check if a file already exists with the same name for the same ressouce
-                    # NiceToHave: Use versioning when updating the same documents
-                    oldres = self.search(cr, uid, [('name','=',name),('res_id','=',vals['res_id'])])
-                    if self.search(cr, uid, [('name','=',fname),('res_id','=',vals['res_id'])]):
-                        raise osv.except_osv(_("Error!"),_("A document already exists with the same name for this ressource (model:%s / id:%s)"%(vals['res_model'],vals['res_id'])))
-
-                    fp = tempfile.NamedTemporaryFile(delete=False, suffix=extension)
-                    fp.write(base64.decodestring(vals['datas']))
-                    fp.close()
-                    fdata = open(fp.name,'r')
-
-                    #fdata = io.BytesIO(base64.decodestring(vals['datas']))    
-                    #fdata = io.StringIO(unicode(vals['datas']))        
-                    try:
-                        newDoc = cmisDir.createDocument(vals['datas_fname'], contentFile=fdata)
-                    except:
-                        raise osv.except_osv(_('Error!'),_("Cannot create that document in the CMIS Server."))
-
-                    fdata.close()
-
-                    # Get the cmis object id and store it in the attachment
-                    link_url = self.pool.get('ir.config_parameter').get_param(cr, uid, 'document_cmis.server_link_url')
-                    url = link_url + newDoc.properties['cmis:objectId']
-                
-                    vals['type'] = 'url'
-                    vals['url'] = url
-                    vals['cmis_object_id'] = newDoc.properties['cmis:objectId']
-                    vals['db_datas'] = ""
-        
-            if server_mode == 'cmis_only' and not dir_found:
-                # Does not attach document if no CMIS ID is specified and server mode is cmis_only
-                # Or else fallback to OpenERP DMS
-                raise osv.except_osv(_("Error!"),_("You cannot add attachments to this record"))
-
-            gc.collect()
+        else:
+           # Does not attach document if no CMIS ID is specified and server mode is cmis_only
+           # Or else fallback to OpenERP DMS
+           raise osv.except_osv(_("Error!"),_("You cannot add attachments to this record"))
 
         return super(ir_attachment, self).create(cr, uid, vals, context)
-
 
     def unlink(self, cr, uid, ids, context=None):
         """Delete the cmis document when a ressource is deleted"""
         for doc in self.pool.get('ir.attachment').browse(cr, uid, ids):
             if doc.type == 'url':
-                repo = cmis_connect(cr, uid)
-                if not repo:
-                    raise osv.except_osv(_('Error!'),_("Cannot find the root directory for OpenERP in the CMIS Server."))
-
-                for attachment in self.browse(cr, uid, ids):
-                    if attachment.cmis_object_id:
-                        try:
-                            doc = repo.getObject(attachment.cmis_object_id)
-                            doc.delete()
-                        except:
-                            raise osv.except_osv(_("Error!"),_("Cannot delete that document in the CMIS Server: %s"%(attachment.name)))
+               cmis_object_id = doc.cmis_object_id.split('/')[-1]
+               with alfresco_api_handler(self, cr, uid) as api:
+                  response = api('DELETE',nodes.node(cmis_object_id))
 
         return super(ir_attachment, self).unlink(cr, uid, ids, context=context)
 

@@ -24,7 +24,34 @@ openerp.web_natuurpunt_contacten = function(instance) {
        }
    });
    instance.web.form.widgets.add('natuurpunt_attachments', 'instance.web.form.NatuurpuntAttachments');
-   
+
+   instance.web.form.NatuurpuntAlfrescoDropoff = instance.web.form.FieldChar.extend({
+       template: "NatuurpuntAlfrescoDropoff",
+       init: function (view, code) {
+           this._super.apply(this,arguments);
+       },
+       start: function() {
+           this._super();
+           System.import('app.alfresco.dropoff/main')
+               .then((module) => { module.main(instance); })
+               .catch(function(err){ console.error(err); });
+       }
+   });
+   instance.web.form.widgets.add('natuurpunt_alfresco_dropoff', 'instance.web.form.NatuurpuntAlfrescoDropoff');   
+
+   instance.web.form.NatuurpuntEmail = instance.web.form.FieldChar.extend({
+       template: "NatuurpuntEmail",
+       init: function (view, code) {
+           this._super.apply(this,arguments);
+       },
+       start: function() {
+           this._super();
+           System.import('app.email/main')
+               .then((module) => { module.main(instance); })
+               .catch(function(err){ console.error(err); });
+       }
+   });
+   instance.web.form.widgets.add('natuurpunt_email', 'instance.web.form.NatuurpuntEmail');
 
    instance.web.search.CustomFilters.include({
         append_filter: function(filter) {

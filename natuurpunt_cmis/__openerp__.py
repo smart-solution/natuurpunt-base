@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 ##############################################################################
 #
-#    Smart Solution bvba
-#    Copyright (C) 2010-Today Smart Solution BVBA (<http://www.smartsolution.be>).
-#
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU Affero General Public License as
 #    published by the Free Software Foundation, either version 3 of the
@@ -19,14 +16,19 @@
 #
 ############################################################################## 
 
-from network import get_eth0
-from toolkit import sql_wrapper
-from toolkit import compose
-from toolkit import sum_groupby
-from toolkit import create_node
-from toolkit import create_xml
-from toolkit import transform
-from toolkit import uids_in_group
-from toolkit import match_with_existing_partner
-from toolkit import get_approval_state
-from toolkit import get_included_product_ids
+{
+    "name" : "natuurpunt_cmis",
+    "version" : "1.0",
+    "author" : "Natuurpunt (joeri.belis@natuurpunt.be)",
+    "website" : "www.natuurpunt.be",
+    "category" : "base",
+    "description": """
+    Custom cmis support for natuurpunt
+""",
+    "depends" : ["natuurpunt_purchase",],
+    "data" : ["natuurpunt_cmis_view.xml",],
+    "init_xml" : [],
+    "update_xml" : [],
+    "active": False,
+    "installable": True
+}

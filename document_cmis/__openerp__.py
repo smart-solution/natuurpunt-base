@@ -32,7 +32,7 @@
     When the attachment is deleted, the document is deleted in Alfresco
     Relies on the standard DMS directory configuration of OpenERP. It allows to freely configure where each resource will be stored in Alfresco. Even across multiple Alfresco sites.
 """,
-    "depends" : ["document", "web_attach_extended"],
+    "depends" : ["document", "web_attach_extended", "account"],
     "data" : [
         'document_cmis_view.xml',
         'document_cmis_data.xml',

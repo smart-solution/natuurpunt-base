@@ -36,6 +36,19 @@ def sql_wrapper(sqlstat, method=None):
 def compose(*functions):
     return reduce(lambda f, g: lambda x: g(f(x)), functions, lambda x: x)
 
+def get_included_product_ids(prod_object, cr, uid, prod_id):
+    """returns included product ids from combined product.
+    all except 'gewoon lid' have included products
+    @param mem: id of combined product
+    @param return: list ids or membership_product id list if empty
+    """
+    if prod_id:
+        included_prod_ids = prod_object.read(cr, uid, prod_id, ['included_product_ids'])['included_product_ids']
+        return sorted(included_prod_ids) if included_prod_ids else [prod_id]
+    else:
+        included_prod_ids = prod_object.search(cr, uid, [('membership_product','=',True),('included_product_ids','=',False)])
+        return included_prod_ids
+
 def sum_groupby(groupby_obj, keys_to_sum=None):
     if not keys_to_sum:
         return None
@@ -159,6 +172,13 @@ def uids_in_group(obj, cr, uid, group, partner=False, context=None):
             return [user.id for user in group_obj.users]
     else:
         return []
+
+def get_approval_state(obj, cr, uid, inv, context = None):
+    mod_obj = obj.pool.get('purchase.approval.item')
+    mod_ids = mod_obj.search(cr, uid,[('invoice_id', '=', inv.id)], context=context)
+    res = mod_obj.read(cr, uid, mod_ids, fields=['state'], context=context)
+    state = res[0]['state'] if res else False
+    return state
 
 def create_node(tag, data, *sub_nodes):
     def create_element():

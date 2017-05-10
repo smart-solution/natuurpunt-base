@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 ##############################################################################
 #
-#    Smart Solution bvba
-#    Copyright (C) 2010-Today Smart Solution BVBA (<http://www.smartsolution.be>).
-#
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU Affero General Public License as
 #    published by the Free Software Foundation, either version 3 of the
@@ -17,16 +14,18 @@
 #    You should have received a copy of the GNU Affero General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-############################################################################## 
+##############################################################################
 
-from network import get_eth0
-from toolkit import sql_wrapper
-from toolkit import compose
-from toolkit import sum_groupby
-from toolkit import create_node
-from toolkit import create_xml
-from toolkit import transform
-from toolkit import uids_in_group
-from toolkit import match_with_existing_partner
-from toolkit import get_approval_state
-from toolkit import get_included_product_ids
+def queries(id, term):
+    return '/queries/nodes?rootNodeId={}&term={}'.format(id,term)
+
+def children(id):
+    return '/nodes/{}/children'.format(id)
+
+def node(id):
+    return '/nodes/{}'.format(id)
+
+def move(id):
+    return '/nodes/{}/move'.format(id)
+
+# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
