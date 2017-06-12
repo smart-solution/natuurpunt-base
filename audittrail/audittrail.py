@@ -51,6 +51,31 @@ def filter_columns(model, all_columns):
             #'bank_ids',
         ]
         return {k:v for k, v in all_columns.items() if k not in non_audittrail_fields}
+    elif model == 'account.analytic.account':
+        non_audittrail_fields = [
+            'message_follower_ids',
+            'quantity_max',
+            'currency_id',
+            'child_complete_ids',
+            'message_ids',
+            'message_summary',
+            'company_uom_id',
+            'message_is_follower',
+            'date_start',
+            'state'
+            'complete_name',
+            'debit',
+            'description',
+            'dimension_sequence',
+            'date',
+            'balance',
+            'credit',
+            'line_ids',
+            'message_unread',
+            'template_id',
+            'quantity',
+        ]
+        return {k:v for k, v in all_columns.items() if k not in non_audittrail_fields}
     else:
         return all_columns
 
