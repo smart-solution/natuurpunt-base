@@ -27,6 +27,58 @@ import time
 from openerp import tools
 from openerp import SUPERUSER_ID
 
+def filter_columns(model, all_columns):
+    """
+    """
+    if model == 'res.partner':
+        non_audittrail_fields = [
+            'unreconciled_aml_ids',
+            'payment_earliest_due_date',
+            'latest_followup_level_id',
+            'payment_amount_overdue',
+            'debit_limit',
+            'debit',
+            'latest_followup_date',
+            'property_product_pricelist_purchase',
+            'credit',
+            'invoice_ids',
+            'crm_payment_ids',
+            'latest_followup_level_id_without_lit',
+            'property_account_payable',
+            'crm_move_ids',
+            'credit_limit',
+            'payment_amount_due',
+            #'bank_ids',
+        ]
+        return {k:v for k, v in all_columns.items() if k not in non_audittrail_fields}
+    elif model == 'account.analytic.account':
+        non_audittrail_fields = [
+            'message_follower_ids',
+            'quantity_max',
+            'currency_id',
+            'child_complete_ids',
+            'message_ids',
+            'message_summary',
+            'company_uom_id',
+            'message_is_follower',
+            'date_start',
+            'state'
+            'complete_name',
+            'debit',
+            'description',
+            'dimension_sequence',
+            'date',
+            'balance',
+            'credit',
+            'line_ids',
+            'message_unread',
+            'template_id',
+            'quantity',
+        ]
+        return {k:v for k, v in all_columns.items() if k not in non_audittrail_fields}
+    else:
+        return all_columns
+
 class audittrail_rule(osv.osv):
     """
     For Auddittrail Rule
@@ -329,7 +381,11 @@ class audittrail_objects_proxy(object_proxy):
         data = {}
         resource_pool = pool.get(model.model)
         # read all the fields of the given resources in super admin mode
-        for resource in resource_pool.read(cr, SUPERUSER_ID, res_ids, resource_pool._all_columns):
+        if res_ids:
+            filtered_columns = filter_columns(model.model, resource_pool._all_columns)
+        else:
+            return data
+        for resource in resource_pool.read(cr, SUPERUSER_ID, res_ids, filtered_columns):
             values = {}
             values_text = {}
             resource_id = resource['id']
@@ -405,7 +461,8 @@ class audittrail_objects_proxy(object_proxy):
             key: []
         }
         # loop on all the fields
-        for field_name, field_definition in pool.get(model.model)._all_columns.items():
+        filtered_columns = filter_columns(model.model, pool.get(model.model)._all_columns)
+        for field_name, field_definition in filtered_columns.items():
             if field_name in ('__last_update', 'id'):
                 continue
             #if the field_list param is given, skip all the fields not in that list
