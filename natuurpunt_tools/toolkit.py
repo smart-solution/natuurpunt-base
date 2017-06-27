@@ -163,13 +163,16 @@ def match_with_existing_partner(obj,cr,uid,data):
 def uids_in_group(obj, cr, uid, group, partner=False, context=None):
     mod_obj = obj.pool.get('ir.model.data')
     model_data_ids = mod_obj.search(cr, uid,[('model', '=', 'res.groups'), ('name', '=', group)], context=context)
-    res_id = mod_obj.read(cr, uid, model_data_ids, fields=['res_id'], context=context)[0]['res_id']
-    if res_id:
-        group_obj = obj.pool.get('res.groups').browse(cr, uid, res_id)
-        if partner:
-            return [user.partner_id.id for user in group_obj.users]
+    if model_data_ids:
+        res_id = mod_obj.read(cr, uid, model_data_ids, fields=['res_id'], context=context)[0]['res_id']
+        if res_id:
+            group_obj = obj.pool.get('res.groups').browse(cr, uid, res_id)
+            if partner:
+                return [user.partner_id.id for user in group_obj.users]
+            else:
+                return [user.id for user in group_obj.users]
         else:
-            return [user.id for user in group_obj.users]
+            return []
     else:
         return []
 
