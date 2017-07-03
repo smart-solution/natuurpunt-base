@@ -6,13 +6,13 @@ class natuurpunt_contact_rml_parse(report_sxw.rml_parse):
         self.localcontext.update({
             'display_address_contact': self._display_address_contact,})
 
-    def _display_address_contact(self, partner_id, customer_contact_id, use_company_address=False, context=None):
+    def _display_address_contact(self, partner_id, customer_contact_id=False, use_company_address=False, context=None):
         cr = self.cr
         uid = self.uid
-        if use_company_address:
-            address = self.pool.get('res.partner').search(cr, uid, [('id','=',partner_id)])
+        if not(use_company_address) and customer_contact_id:
+            address = customer_contact_id
         else:
-            address = self.pool.get('res.partner').search(cr, uid, [('id','=',customer_contact_id)])
+            address = partner_id
 
         address_format = address.country_id and address.country_id.address_format or \
               "%(street)s\n%(street2)s\n%(city)s %(state_code)s %(zip)s\n%(country_name)s"
@@ -23,7 +23,9 @@ class natuurpunt_contact_rml_parse(report_sxw.rml_parse):
             'country_name': address.country_id and address.country_id.name or '',
             'company_name': address.parent_id and address.parent_name or '',
         }
-        for field in address._address_fields(cr, uid, context=context):
+        for field in self.pool.get('res.partner')._address_fields(cr, uid, context=context):
             args[field] = getattr(address, field) or ''
+        if customer_contact_id:
+            args['customer_contact_name'] = customer_contact_id.name
+            address_format = '%(customer_contact_name)s\n' + address_format
         return address_format % args
-
