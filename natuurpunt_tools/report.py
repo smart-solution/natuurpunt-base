@@ -2,7 +2,7 @@ from openerp.report import report_sxw
 
 class natuurpunt_contact_rml_parse(report_sxw.rml_parse):
     def __init__(self, cr, uid, name, context):
-        super(account_invoice, self).__init__(cr, uid, name, context=context)
+        super(natuurpunt_contact_rml_parse, self).__init__(cr, uid, name, context=context)
         self.localcontext.update({
             'display_address_contact': self._display_address_contact,})
 
