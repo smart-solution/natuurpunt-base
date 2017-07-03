@@ -173,7 +173,7 @@
     </record>	
 
     <record id="view_natuurpunt_account_supplier_invoice_form_options" model="ir.ui.view">
-            <field name="name">view.natuurpunt_account.supplier.invoice.form.options</field>
+            <field name="name">view.natuurpunt.account.supplier.invoice.form.options</field>
             <field name="model">account.invoice</field>
             <field name="inherit_id" ref="natuurpunt_account.view_natuurpunt_account_supplier_invoice_form" />
             <field name="arch" type="xml">
