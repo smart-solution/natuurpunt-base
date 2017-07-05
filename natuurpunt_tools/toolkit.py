@@ -160,6 +160,27 @@ def match_with_existing_partner(obj,cr,uid,data):
     }
     return (partner if partner else False, vals, log)
 
+def partner_url(obj, cr):
+    link = "<b><a href='{}?db={}#id={}&view_type=form&model=res.partner'>"
+    html_end = "</a></b>"
+    base_url = obj.pool.get('ir.config_parameter').get_param(cr, SUPERUSER_ID, 'web.base.url')
+    return link, base_url, html_end
+
+def send_internal_alerts(obj,cr,uid,data):
+    """
+    """
+    partner, vals, log = data
+    for alert in log['alert']:
+        link, base_url, html_end = partner_url(obj, cr)
+        contact = partner.name + '[email = ' + vals['email'] + ']'
+        body = link.format(base_url,cr.dbname,partner.id) + contact + ' : ' + alert + html_end
+        mail_group_id = obj.pool.get('mail.group').group_word_lid_alerts(cr,uid)
+        message_id = obj.pool.get('mail.group').message_post(cr, uid, mail_group_id,
+                                body=body,
+                                subtype='mail.mt_comment', context={})
+        obj.pool.get('mail.message').set_message_read(cr, uid, [message_id], False)
+    return partner, log
+
 def uids_in_group(obj, cr, uid, group, partner=False, context=None):
     mod_obj = obj.pool.get('ir.model.data')
     model_data_ids = mod_obj.search(cr, uid,[('model', '=', 'res.groups'), ('name', '=', group)], context=context)
