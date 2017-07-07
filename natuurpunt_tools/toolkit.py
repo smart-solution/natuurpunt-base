@@ -24,6 +24,7 @@ from lxml import etree, objectify
 from collections import Counter
 import difflib
 from unidecode import unidecode
+from openerp import SUPERUSER_ID
 
 def sql_wrapper(sqlstat, method=None):
     def execute_sql(cr):
