@@ -1,10 +1,12 @@
 from openerp.report import report_sxw
 
-class natuurpunt_contact_rml_parse(report_sxw.rml_parse):
+class natuurpunt_rml_parse(report_sxw.rml_parse):
     def __init__(self, cr, uid, name, context):
-        super(natuurpunt_contact_rml_parse, self).__init__(cr, uid, name, context=context)
+        super(natuurpunt_rml_parse, self).__init__(cr, uid, name, context=context)
         self.localcontext.update({
-            'display_address_contact': self._display_address_contact,})
+            'display_address_contact': self._display_address_contact,
+            'get_reference': self._get_reference,
+            })
 
     def _display_address_contact(self, partner_id, customer_contact_id=False, use_company_address=False, context=None):
         cr = self.cr
@@ -29,3 +31,9 @@ class natuurpunt_contact_rml_parse(report_sxw.rml_parse):
             args['customer_contact_name'] = customer_contact_id.name
             address_format = '%(customer_contact_name)s\n' + address_format
         return address_format % args
+    
+    def _get_reference(self,reference):
+        if reference:
+            return 'Uw Referentie: ' + str(reference)
+        else:
+            return  ''
