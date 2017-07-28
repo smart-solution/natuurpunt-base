@@ -137,9 +137,13 @@ def rename_draft_folder_to_target_folder(api,vals):
     response = api('GET',nodes.queries(vals['cmis_object_id'],vals['draft_folder']))
     query_res = [entry['entry'] for entry in response.json()['list']['entries']]
     if any([r['isFolder'] for r in query_res]) if query_res else False:
-       vals['draft_folder_id'] = [r['id'] for r in query_res if r['isFolder']][0]
-       request_body = json.dumps({'name':vals['target_folder']})
-       response = api('PUT',nodes.node(vals['draft_folder_id']),data=request_body)
+       draft_folder = [r['name'] for r in query_res][0]
+       _logger.info("found draft folder {} with search term {}".format(draft_folder,vals['draft_folder']))
+       if vals['draft_folder'] == draft_folder:
+           _logger.info("draft folder rename {} to {}".format(vals['draft_folder'],vals['target_folder']))
+           vals['draft_folder_id'] = [r['id'] for r in query_res if r['isFolder']][0]
+           request_body = json.dumps({'name':vals['target_folder']})
+           response = api('PUT',nodes.node(vals['draft_folder_id']),data=request_body)
     return response
 
 def move_from_dropoff_folder_to_target_folder(api,vals):
