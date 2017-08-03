@@ -31,5 +31,6 @@ from toolkit import match_with_existing_partner
 from toolkit import send_internal_alerts
 from toolkit import get_approval_state
 from toolkit import get_included_product_ids
+from toolkot import koalect_webservice
 
 import report
