@@ -26,19 +26,18 @@ import logging
 
 _logger = logging.getLogger(__name__)
 
-def setup_koalect_rest_api(headers):
-    server_url = 'http://api.koalect.com/openapi/transactions?page={}&limit={}'
+def setup_koalect_webservice(url,headers):
     def api_call_wrapper(page,limit):
-        response = requests.get(server_url.format(page,limit),headers=headers)
+        response = requests.get(url.format(page,limit),headers=headers)
         response.raise_for_status()
         return response
     return api_call_wrapper
 
 @contextmanager
-def koalect_api_handler(headers):
+def koalect_webservice_handler(url,headers):
     try:
-        koalect_rest_api = setup_koalect_rest_api(headers)
-        yield koalect_rest_api
+        koalect_webservice = setup_koalect_webservice(url,headers)
+        yield koalect_webservice
     except requests.exceptions.Timeout:
         raise osv.except_osv(_("Error!"),_("Koalect webservice: Timeout"))
     except requests.exceptions.TooManyRedirects:
@@ -50,21 +49,12 @@ def koalect_api_handler(headers):
         _logger.exception(err)
         raise osv.except_osv(_("Koalect webservice HTTPError!"),_(err))
 
-def consume_koalect_webservice(headers,page):
-    with koalect_api_handler(headers) as koalect_api:
-        response = koalect_api(page,10)
-    koalect_data = response.json()
-    #keep the sorted order from new to older
-    data = [(d['id'], d) for d in koalect_data['data']]
-    return [koalect_data['page']], data
-
-def koalect_webservice(headers):
+def koalect_webservice(url,key):
     mem = []
     page = []
-    def store_in_memory(t):
-        mem.extend(t[1])
-        page.extend(t[0])
-    def get_koalect_data(id):
+    limit = 10
+    headers = {'Authorization':key}
+    def get_data_from_mem_or_call_api(id,koalect_api):
         # id in memoize
         try:
             index = [item[0] for item in mem].index(id)
@@ -72,9 +62,16 @@ def koalect_webservice(headers):
         except ValueError:
             if mem and mem[-1][0] < id:
                 return []
-            else: # consume more
-                store_in_memory(consume_koalect_webservice(headers,page[-1]+1 if page else 1))
-                return get_koalect_data(id)
-    return get_koalect_data
+            else: # consume webservice
+                response = koalect_api(page[-1]+1 if page else 1,limit)
+                koalect_data = response.json()
+                data = [(d['id'], d) for d in koalect_data['data']]
+                mem.extend(data)
+                page.extend([koalect_data['page']])
+                return get_data_from_mem_or_call_api(id,koalect_api)
+    def get_data(id):
+        with koalect_webservice_handler(url,headers) as koalect_api:
+            return get_data_from_mem_or_call_api(id,koalect_api)
+    return get_data
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
