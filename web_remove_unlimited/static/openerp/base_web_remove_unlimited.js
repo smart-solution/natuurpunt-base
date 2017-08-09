@@ -7,6 +7,16 @@ openerp.web_remove_unlimited = function(instance) {
 // here you may tweak globals object, if any, and play with on_* or do_* callbacks on them
 
     instance.web.ListView.include({
+        init: function(parent, dataset, view_id, options) {
+           var self = this;
+           if (dataset.model=='res.partner') {
+              this.defaults.selectable = false
+           }
+           else {
+              this.defaults.selectable = true
+           }
+           var ret = this._super.apply(this, arguments);
+        },
         load_list: function(data) {
             var self = this;
             var ret = this._super.apply(this, arguments); 

@@ -19,21 +19,68 @@
 ##############################################################################
 
 from osv import osv, fields
+from openerp.tools.translate import _
+from lxml import etree
+from openerp.osv.orm import setup_modifiers
+from natuurpunt_tools import uids_in_group
 
 class res_partner(osv.osv):
     _inherit = 'res.partner'
+
+    def _edit_only(self,cr,uid,ids,fieldnames,args,context=None):
+        res = dict.fromkeys(ids)
+        for partner in self.browse(cr, uid, ids, context=context):
+            protect_contact = uids_in_group(self, cr, uid, 'group_natuurpunt_protect_partner', context=context)
+            res[partner.id] = True if uid in protect_contact else False
+        return res
+
+    _columns = {
+        'edit_only':fields.function(
+                         _edit_only,
+                         method=True,
+                         type='boolean',
+                         string='edit_only',
+                    ),
+    }
+
 
     def fields_view_get(self, cr, uid, view_id=None, view_type=None, context=None, toolbar=False, submenu=False):
         res = super(res_partner, self).fields_view_get(cr, uid, view_id=view_id, view_type=view_type, context=context, toolbar=toolbar, submenu=submenu)
         context = context or {}
         # custom natuurpunt sidebar security
-        mod_obj = self.pool.get('ir.model.data')
-        model_data_ids = mod_obj.search(cr, uid,[('model', '=', 'res.groups'), ('name', '=', 'group_natuurpunt_crm_user')], context=context)
-        res_id = mod_obj.read(cr, uid, model_data_ids, fields=['res_id'], context=context)[0]['res_id']
-        dim_group = self.pool.get('res.groups').browse(cr, uid, res_id)
-        gp_users = [x.id for x in dim_group.users]
+        gp_users = uids_in_group(self, cr, uid, 'group_natuurpunt_crm_user', context=context)
+        # power user
+        protect_contact = uids_in_group(self, cr, uid, 'group_natuurpunt_protect_partner', context=context)
 
-        if view_type == 'form' and uid not in gp_users:
+        doc = etree.XML(res['arch'])
+
+        if view_type == 'tree' and uid in protect_contact:
+            #disable create button
+            [node.set('create', '0') for node in doc.xpath("/tree")]
+            [node.set('delete', '0') for node in doc.xpath("/tree")]
+
+        if view_type == 'form' and uid in protect_contact:
+            #disable create button
+            [node.set('create', '0') for node in doc.xpath("/form")]
+            [node.set('delete', '0') for node in doc.xpath("/form")]
+
+            #disable stamdata
+            method_nodes = doc.xpath("//field[not(ancestor::notebook)]")
+            for node in method_nodes:
+                node.set('readonly', '1')
+                field = node.get('name')
+                setup_modifiers(node, res['fields'][field])
+
+            #disable contacts tab, assuming this is the first tab always!
+            method_nodes = doc.xpath("(/form/sheet/notebook/page)[1]//field")
+            for node in method_nodes:
+                node.set('readonly', '1')
+                field = node.get('name')
+                setup_modifiers(node, res['fields'][field])
+
+        res['arch'] = etree.tostring(doc)
+
+        if (view_type == 'form' or view_type == 'tree') and uid not in gp_users:
             res['toolbar'] = False
         return res
 

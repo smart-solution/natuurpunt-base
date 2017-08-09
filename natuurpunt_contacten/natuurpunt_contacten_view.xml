@@ -24,6 +24,27 @@
                 </tree>
             </field>
         </record>
+
+        <record model="ir.ui.view" id="view_natuurpunt_contacten_partner_form">
+            <field name="name">view.natuurpunt.contacten.partner.form</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="natuurpunt_crm.view_natuurpunt_crm_partner_form"/>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+               <field name="active" position="before">
+                 <field name="edit_only" invisible="1"/>
+			   </field>
+               <xpath expr='/form' position='attributes'>
+                 <attribute name="attrs">{'create': [('edit_only', '=', False)]}</attribute>
+               </xpath>
+               <xpath expr="//page[@string='Accounting']" position="attributes">
+                 <attribute name="groups">natuurpunt_crm.group_natuurpunt_crm_user</attribute>
+               </xpath>
+               <xpath expr="//page[@string='Sales &amp; Purchases']" position="attributes">
+                 <attribute name="groups">natuurpunt_crm.group_natuurpunt_crm_user</attribute>
+               </xpath>	 
+           </field>
+        </record>
                 
 		<record id="view_natuurpunt_partner_search_contacten" model="ir.ui.view">
 			<field name="name">view.natuurpunt.partner.search.contacten</field>
