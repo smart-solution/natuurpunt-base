@@ -61,7 +61,7 @@ def koalect_webservice(url,key):
             return mem[index]
         except ValueError:
             if mem and mem[-1][0] < id:
-                return []
+                return id
             else: # consume webservice
                 response = koalect_api(page[-1]+1 if page else 1,limit)
                 koalect_data = response.json()
@@ -70,8 +70,12 @@ def koalect_webservice(url,key):
                 page.extend([koalect_data['page']])
                 return get_data_from_mem_or_call_api(id,koalect_api)
     def get_data(id):
-        with koalect_webservice_handler(url,headers) as koalect_api:
-            return get_data_from_mem_or_call_api(id,koalect_api)
+        # support recursive call to get_data
+        if isinstance( id, ( int, long ) ):
+            with koalect_webservice_handler(url,headers) as koalect_api:
+                return get_data_from_mem_or_call_api(id,koalect_api)
+        else:
+            return id
     return get_data
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
