@@ -364,6 +364,9 @@
             <field name="model">res.partner</field>
             <field name="inherit_id" ref="base.view_partner_form" />
             <field name="arch" type="xml">
+				<xpath expr="//field[@name='parent_id']" position="attributes">
+                       <attribute name="options">{'limit': 10, 'create': false, 'create_edit': false}</attribute>
+                </xpath>
                 <xpath expr="//field[@name='user_id']" position="attributes">
                       <attribute name="options">{'limit': 10, 'create': false, 'create_edit': false}</attribute>
                 </xpath>
