@@ -25,3 +25,4 @@ access_account_account_analytic_dimension_read1,access.account.account.analytic.
 access_wizard_data_multi_analytic_dimenion_user,access.wizard.data,multi_analytical_account.model_wizard_data,multi_analytical_account.group_multi_analytic_dimenion_user,1,1,1,1
 access_ir_sequence_purchase_requisition_user,ir.sequence group_purchase_requisition_user,base.model_ir_sequence,purchase_requisition.group_purchase_requisition_user,1,1,0,0
 hr.access_hr_employee_user,hr.employee user,hr.model_hr_employee,base.group_hr_user,1,0,0,0
+hr.access_hr_employee_manager,hr.employee manager,hr.model_hr_employee,base.group_hr_manager,1,1,1,1
