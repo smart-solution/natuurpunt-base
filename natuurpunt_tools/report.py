@@ -12,8 +12,10 @@ class natuurpunt_rml_parse(report_sxw.rml_parse):
         cr = self.cr
         uid = self.uid
         if not(use_company_address) and customer_contact_id:
+            prefix = 'p/a '
             address = customer_contact_id
         else:
+            prefix = 't.a.v. '
             address = partner_id
 
         address_format = address.country_id and address.country_id.address_format or \
@@ -29,7 +31,7 @@ class natuurpunt_rml_parse(report_sxw.rml_parse):
             args[field] = getattr(address, field) or ''
         if customer_contact_id:
             args['customer_contact_name'] = customer_contact_id.name
-            address_format = '%(customer_contact_name)s\n' + address_format
+            address_format = prefix + '%(customer_contact_name)s\n' + address_format
         return address_format % args
     
     def _get_reference(self,reference):
