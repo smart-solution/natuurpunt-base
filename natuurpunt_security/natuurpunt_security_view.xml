@@ -9,6 +9,12 @@
               groups="natuurpunt_security.group_natuurpunt_knowledge_manager"
               sequence="50"/>
 
+    <!-- Top menu item -->
+    <menuitem name="Events"
+            id="event_main_menu"
+            groups="event.group_event_user"
+            sequence="115"/>
+
     <!-- override default view : hide edit|create buttons for everybody -->
     <record model="ir.ui.view" id="view_document_file_tree">
         <field name="name">ir.attachment.inherit</field>

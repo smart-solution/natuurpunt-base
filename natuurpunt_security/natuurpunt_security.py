@@ -23,8 +23,8 @@ class res_partner(osv.osv):
     _inherit = 'res.partner'
 
     _columns = {
-        'zip_ids': fields.many2many('res.country.city', 'res_organisation_city_rel', 'partner_id', 'zip_id', 'Gemeentes afdelingen',groups='natuurpunt_contacten.group_natuurpunt_contacten_poweruser'),
-        'm2m_zip_ids': fields.many2many('res.country.city', 'res_organisation_city_m2m_rel', 'partner_id', 'zip_id', 'Gemeentes overige',groups='natuurpunt_contacten.group_natuurpunt_contacten_poweruser'),
+        'zip_ids': fields.many2many('res.country.city', 'res_organisation_city_rel', 'partner_id', 'zip_id', 'Gemeentes afdelingen',),
+        'm2m_zip_ids': fields.many2many('res.country.city', 'res_organisation_city_m2m_rel', 'partner_id', 'zip_id', 'Gemeentes overige',),
     }
 
 res_partner()
