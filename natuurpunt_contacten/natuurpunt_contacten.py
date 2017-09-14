@@ -65,11 +65,13 @@ class res_partner(osv.osv):
             [node.set('delete', '0') for node in doc.xpath("/form")]
 
             #disable stamdata
-            method_nodes = doc.xpath("//field[not(ancestor::notebook)]")
-            for node in method_nodes:
-                node.set('readonly', '1')
-                field = node.get('name')
-                setup_modifiers(node, res['fields'][field])
+            view = self.pool.get('ir.ui.view').browse(cr,uid,view_id)
+            if view.name != u'organisation.partner.form':
+                method_nodes = doc.xpath("//field[not(ancestor::notebook)]")
+                for node in method_nodes:
+                    node.set('readonly', '1')
+                    field = node.get('name')
+                    setup_modifiers(node, res['fields'][field])
 
             #disable contacts tab, assuming this is the first tab always!
             method_nodes = doc.xpath("(/form/sheet/notebook/page)[1]//field")
