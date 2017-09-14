@@ -11,7 +11,7 @@
 
     <!-- Top menu item -->
     <menuitem name="Events"
-            id="event_main_menu"
+            id="event.event_main_menu"
             groups="event.group_event_user"
             sequence="115"/>
 
