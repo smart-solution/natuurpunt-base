@@ -9,7 +9,7 @@ openerp.web_remove_unlimited = function(instance) {
     instance.web.ListView.include({
         init: function(parent, dataset, view_id, options) {
            var self = this;
-           if (dataset.model=='res.partner') {
+           if (dataset.model=='res.partner'||dataset.model=='res.organisation.function') {
               this.defaults.selectable = false
            }
            else {
