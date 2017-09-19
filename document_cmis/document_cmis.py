@@ -159,7 +159,6 @@ def upload_file_from_disk(api,vals):
     extension = ".txt" if len(extension) == 1 else "." + extension[-1]
     fp = tempfile.NamedTemporaryFile(delete=False, suffix=extension)
     fp.write(base64.decodestring(vals['datas']))
-    fp.write(vals['datas'])
     fp.close()
     node = nodes.children(vals['target_folder_id'])
     # automatic closing of file 
