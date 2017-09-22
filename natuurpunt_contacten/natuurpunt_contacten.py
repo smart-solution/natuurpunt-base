@@ -28,7 +28,7 @@ class account_analytic_account(osv.osv):
     _inherit = 'account.analytic.account'
 
     def fields_view_get(self, cr, uid, view_id=None, view_type=None, context=None, toolbar=False, submenu=False):
-        res = super(res_partner, self).fields_view_get(cr, uid, view_id=view_id, view_type=view_type, context=context, toolbar=toolbar, submenu=submenu)
+        res = super(account_analytic_account, self).fields_view_get(cr, uid, view_id=view_id, view_type=view_type, context=context, toolbar=toolbar, submenu=submenu)
         context = context or {}
 
         if (view_type == 'form' or view_type == 'tree'):
