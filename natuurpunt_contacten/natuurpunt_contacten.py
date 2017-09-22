@@ -66,7 +66,7 @@ class res_partner(osv.osv):
 
             #disable stamdata
             view = self.pool.get('ir.ui.view').browse(cr,uid,view_id)
-            if view.name != u'organisation.partner.form':
+            if view and view.name != u'organisation.partner.form':
                 method_nodes = doc.xpath("//field[not(ancestor::notebook)]")
                 for node in method_nodes:
                     node.set('readonly', '1')
