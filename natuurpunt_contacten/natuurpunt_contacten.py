@@ -55,18 +55,19 @@ class res_partner(osv.osv):
         doc = etree.XML(res['arch'])
 
         if view_type == 'tree' and uid in protect_contact:
-            #disable create button
-            [node.set('create', '0') for node in doc.xpath("/tree")]
-            [node.set('delete', '0') for node in doc.xpath("/tree")]
+            view = self.pool.get('ir.ui.view').browse(cr,uid,view_id)
+            if view.id and view.name != u'organisation.partner.tree':
+                #disable create button
+                [node.set('create', '0') for node in doc.xpath("/tree")]
+                [node.set('delete', '0') for node in doc.xpath("/tree")]
 
         if view_type == 'form' and uid in protect_contact:
-            #disable create button
-            [node.set('create', '0') for node in doc.xpath("/form")]
-            [node.set('delete', '0') for node in doc.xpath("/form")]
-
             #disable stamdata
             view = self.pool.get('ir.ui.view').browse(cr,uid,view_id)
             if view.id and view.name != u'organisation.partner.form':
+                #disable create button
+                [node.set('create', '0') for node in doc.xpath("/form")]
+                [node.set('delete', '0') for node in doc.xpath("/form")]
                 method_nodes = doc.xpath("//field[not(ancestor::notebook)]")
                 for node in method_nodes:
                     node.set('readonly', '1')
