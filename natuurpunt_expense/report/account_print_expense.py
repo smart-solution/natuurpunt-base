@@ -21,8 +21,9 @@
 
 import time
 from openerp.report import report_sxw
+from natuurpunt_tools import report
 
-class account_expense(report_sxw.rml_parse):
+class account_expense(report.natuurpunt_rml_parse):
     def __init__(self, cr, uid, name, context):
 	print "PARSER CALLED"
         super(account_expense, self).__init__(cr, uid, name, context=context)

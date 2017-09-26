@@ -17,7 +17,7 @@
 ##############################################################################
 
 def queries(id, term):
-    return '/queries/nodes?rootNodeId={}&term={}'.format(id,term)
+    return '/queries/nodes?rootNodeId={}&term={}&fields=id,name,isFolder&nodeType=cm:folder'.format(id,term)
 
 def children(id):
     return '/nodes/{}/children'.format(id)

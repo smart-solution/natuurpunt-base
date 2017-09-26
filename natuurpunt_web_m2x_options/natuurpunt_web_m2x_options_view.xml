@@ -158,8 +158,19 @@
             </field>
 	</record>
 
+    <record id="viaw_account_invoice_form_options" model="ir.ui.view">
+            <field name="name">viaw.account.invoice.form.options</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="natuurpunt_account_invoice_ext.viaw_account_invoice_form" />
+            <field name="arch" type="xml">
+                <field name="customer_contact_id" position="attributes">
+                      <attribute name="options">{'limit': 10, 'create': false, 'create_edit': false}</attribute>
+                </field>
+            </field>
+    </record>	
+
     <record id="view_natuurpunt_account_supplier_invoice_form_options" model="ir.ui.view">
-            <field name="name">view.natuurpunt_account.supplier.invoice.form.options</field>
+            <field name="name">view.natuurpunt.account.supplier.invoice.form.options</field>
             <field name="model">account.invoice</field>
             <field name="inherit_id" ref="natuurpunt_account.view_natuurpunt_account_supplier_invoice_form" />
             <field name="arch" type="xml">
@@ -353,6 +364,12 @@
             <field name="model">res.partner</field>
             <field name="inherit_id" ref="base.view_partner_form" />
             <field name="arch" type="xml">
+                <xpath expr="//field[@name='parent_id']" position="attributes">
+                      <attribute name="options">{'limit': 10, 'create': false, 'create_edit': false}</attribute>
+                </xpath>
+                <xpath expr="//field[@name='category_id']" position="attributes">
+                      <attribute name="options">{'limit': 10, 'create': false, 'create_edit': false}</attribute>
+                </xpath>
                 <xpath expr="//field[@name='user_id']" position="attributes">
                       <attribute name="options">{'limit': 10, 'create': false, 'create_edit': false}</attribute>
                 </xpath>
