@@ -33,7 +33,8 @@ openerp.web_remove_unlimited = function(instance) {
             var self = this;
             var ret = this._super.apply(this, arguments); 
             if (this.dataset.model=='res.partner') {
-              this.sidebar.remove_export();
+              if ( this.sidebar )  
+                 this.sidebar.remove_export();
               this.$pager.find('.oe_list_pager_state')
                     .click(function (e) {
                         e.stopPropagation();
