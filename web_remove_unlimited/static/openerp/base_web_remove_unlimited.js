@@ -6,14 +6,31 @@ openerp.web_remove_unlimited = function(instance) {
 
 // here you may tweak globals object, if any, and play with on_* or do_* callbacks on them
 
-    var _t = instance.web._t;
-
     instance.web.Sidebar.include({
-        remove_export: function() {
-            if (this.items['other']) {
-                var items_without_export = this.items['other'].filter(d => d.label != _t("Export"));
-                this.items['other'] = items_without_export;
-                this.redraw();
+        init: function(parent) {
+            var self = this;
+            var ret = this._super.apply(this, arguments);
+            $(window).on(this.fileupload_id, function() {
+                var args = [].slice.call(arguments).slice(1);
+                self.do_attachement_update(self.dataset, self.model_id,args);
+                instance.web.unblockUI();
+                if (self.dataset.model=='sale.order') {
+                    self.getParent().reload();
+                }
+            });
+        },
+        on_attachment_delete: function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            var self = this;
+            var $e = $(e.currentTarget);
+            if (confirm(_t("Do you really want to delete this attachment ?"))) {
+                (new instance.web.DataSet(this, 'ir.attachment')).unlink([parseInt($e.attr('data-id'), 10)]).done(function() {
+                    self.do_attachement_update(self.dataset, self.model_id);
+                    if (self.dataset.model=='sale.order') {
+                        self.getParent().reload();
+                    }
+                });
             }
         }
     });
@@ -33,8 +50,6 @@ openerp.web_remove_unlimited = function(instance) {
             var self = this;
             var ret = this._super.apply(this, arguments); 
             if (this.dataset.model=='res.partner') {
-              if ( this.sidebar )  
-                 this.sidebar.remove_export();
               this.$pager.find('.oe_list_pager_state')
                     .click(function (e) {
                         e.stopPropagation();
