@@ -6,6 +6,8 @@ openerp.web_remove_unlimited = function(instance) {
 
 // here you may tweak globals object, if any, and play with on_* or do_* callbacks on them
 
+    var _t = instance.web._t;
+
     instance.web.Sidebar.include({
         init: function(parent) {
             var self = this;
@@ -32,6 +34,13 @@ openerp.web_remove_unlimited = function(instance) {
                     }
                 });
             }
+        },
+        remove_export: function() {
+            if (this.items['other']) {
+                var items_without_export = this.items['other'].filter(d => d.label != _t("Export"));
+                this.items['other'] = items_without_export;
+                this.redraw();
+            }
         }
     });
 
@@ -50,6 +59,8 @@ openerp.web_remove_unlimited = function(instance) {
             var self = this;
             var ret = this._super.apply(this, arguments); 
             if (this.dataset.model=='res.partner') {
+              if ( this.sidebar )
+                 this.sidebar.remove_export();
               this.$pager.find('.oe_list_pager_state')
                     .click(function (e) {
                         e.stopPropagation();
