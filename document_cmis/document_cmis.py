@@ -178,7 +178,7 @@ class account_invoice(osv.osv):
     def invoice_validate(self, cr, uid, ids, context=None):
         res =  super(account_invoice, self).invoice_validate(cr, uid, ids, context=context)
         for invoice in self.browse(cr, uid, ids):
-            if self.pool.get('ir.attachment').search(cr, uid, [('res_id','=',invoice.id)]):
+            if self.pool.get('ir.attachment').search(cr, uid, [('res_id','=',invoice.id),('res_model','=','account.invoice')]):
                 vals = {'res_model':'account.invoice', 'res_id':invoice.id}
                 ressource, directory = alfresco_repository_from_model(self, cr, uid, vals, context=context)
                 if directory.cmis_object_id:

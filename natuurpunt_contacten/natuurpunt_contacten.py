@@ -77,7 +77,7 @@ class res_partner(osv.osv):
         if view_type == 'form' and uid in protect_contact:
             #disable stamdata
             view = self.pool.get('ir.ui.view').browse(cr,uid,view_id)
-            if view.id and view.name != u'organisation.partner.form':
+            if view.id and view.name != u'organisation.partner.form' or not view.id:
                 #disable create button
                 [node.set('create', '0') for node in doc.xpath("/form")]
                 [node.set('delete', '0') for node in doc.xpath("/form")]
