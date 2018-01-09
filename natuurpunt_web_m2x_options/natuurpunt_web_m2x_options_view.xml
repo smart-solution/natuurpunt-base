@@ -642,6 +642,21 @@
                 </field>
             </field>
         </record>
+
+        <record id="view_order_partner_form_np_options" model="ir.ui.view">
+            <field name="name">view.sale.order.partner.form.np.options</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="natuurpunt_sale_partner.view_order_partner_form_np" />
+            <field name="arch" type="xml">
+                <field name="partner_id" position="attributes">
+                     <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field>
+                <field name="customer_contact_id" position="attributes">
+                     <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field>
+            </field>
+        </record>
+
     </data>
 </openerp>
 
