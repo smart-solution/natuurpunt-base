@@ -376,6 +376,17 @@
             </field>
         </record>
 
+        <record id="view_partner_form_inherit_options" model="ir.ui.view">
+            <field name="name">res.partner.form.inherit.options</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="membership.view_partner_form" />
+            <field name="arch" type="xml">
+                <field name="associate_member" position="attributes">
+                      <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field>
+            </field>
+        </record>
+
         <record id="view_partner_property_form_purchase_options" model="ir.ui.view">
             <field name="name">res.partner.purchase.property.form.purchase.options</field>
             <field name="model">res.partner</field>
@@ -446,15 +457,6 @@
                       <attribute name="options">{'create': false, 'create_edit': false}</attribute>
                 </field>
                 <field name="property_customer_cost_account" position="attributes">
-                      <attribute name="options">{'create': false, 'create_edit': false}</attribute>
-                </field>
-                <field name="third_payer_id" position="attributes">
-                      <attribute name="options">{'create': false, 'create_edit': false}</attribute>
-                </field>
-                <field name="membership_renewal_product_id" position="attributes">
-                      <attribute name="options">{'create': false, 'create_edit': false}</attribute>
-                </field>
-                <field name="associate_member" position="attributes">
                       <attribute name="options">{'create': false, 'create_edit': false}</attribute>
                 </field>
                 <field name="recruiting_member_id" position="attributes">
@@ -645,8 +647,14 @@
             <field name="model">res.partner</field>
             <field name="inherit_id" ref="natuurpunt_membership.natuurpunt_membership_partner_form" />
             <field name="arch" type="xml">
+                <field name="third_payer_id" position="attributes">
+                      <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field>
                 <field name="free_membership_class_id" position="attributes">
                      <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field>
+                <field name="membership_renewal_product_id" position="attributes">
+                      <attribute name="options">{'create': false, 'create_edit': false}</attribute>
                 </field>
             </field>
         </record>
