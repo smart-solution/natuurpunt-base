@@ -456,9 +456,6 @@
                 <field name="property_account_payable" position="attributes">
                       <attribute name="options">{'create': false, 'create_edit': false}</attribute>
                 </field>
-                <field name="property_customer_cost_account" position="attributes">
-                      <attribute name="options">{'create': false, 'create_edit': false}</attribute>
-                </field>
                 <field name="recruiting_member_id" position="attributes">
                       <attribute name="options">{'create': false, 'create_edit': false}</attribute>
                 </field>
@@ -478,6 +475,17 @@
                 </field>
             </field>
         </record>	
+
+        <record id="view_customer_cost_accout_form_options" model="ir.ui.view">
+            <field name="name">view.customer.cost.account.form.options</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="account_sale_invoice_customer_account.view_customer_cost_accout_form" />
+            <field name="arch" type="xml">
+                <field name="property_customer_cost_account" position="attributes">
+                      <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field>
+            </field>
+        </record> 
 
         <record id="view_natuurpunt_crm_partner_form_options2" model="ir.ui.view">
             <field name="name">view.natuurpunt.crm.partner.form.options2</field>
