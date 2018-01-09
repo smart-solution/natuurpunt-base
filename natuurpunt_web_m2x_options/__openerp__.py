@@ -25,7 +25,7 @@
     "description": """
     - add web_m2x_options to views
 """,
-    "depends" : ["account","organisation_structure","purchase","natuurpunt_crm","natuurpunt_sale","analytic","natuurpunt_vat_mandatory","web_m2x_options",],
+    "depends" : ["account","organisation_structure","purchase","natuurpunt_crm","analytic","natuurpunt_vat_mandatory","web_m2x_options",],
     "data" : ["natuurpunt_web_m2x_options_view.xml",],
     "init_xml" : [],
     "update_xml" : [],
