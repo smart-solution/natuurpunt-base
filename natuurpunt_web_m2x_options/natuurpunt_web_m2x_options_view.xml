@@ -556,7 +556,37 @@
                 </field> 
                 <field name="analytic_account_id" position="attributes">
                      <attribute name="options">{'create': false, 'create_edit': false}</attribute>
-                </field>                
+                </field>    
+                <field name="building_function_id" position="attributes">
+                     <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field> 
+                <field name="building_resp_vzw" position="attributes">
+                     <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field> 
+                <field name="building_ownership_id" position="attributes">
+                     <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field> 
+                <field name="building_spatial_planning_id" position="attributes">
+                     <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field> 
+                <field name="building_heritage_id" position="attributes">
+                     <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field>       
+                <field name="building_resp_id" position="attributes">
+                     <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field>     
+                <field name="building_activa_nr" position="attributes">
+                     <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field> 
+                <field name="building_analytic_dimension_1_id" position="attributes">
+                     <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field> 
+                <field name="building_analytic_dimension_2_id" position="attributes">
+                     <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field> 
+                <field name="building_analytic_dimension_3_id" position="attributes">
+                     <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field>               
             </field>
         </record>
 
@@ -739,6 +769,38 @@
                      <attribute name="options">{'create': false, 'create_edit': false}</attribute>
                 </field>
                 <field name="analytic_dimension_3_id" position="attributes">
+                     <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field>
+            </field>
+        </record>
+        <record id="view_building_insurance_form_options" model="ir.ui.view">
+            <field name="name">view.building.insurance.form.options</field>
+            <field name="model">building.insurance</field>
+            <field name="inherit_id" ref="organisation_structure.view_building_insurance_form" />
+            <field name="arch" type="xml">
+                <field name="type" position="attributes">
+                     <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field>
+                <field name="provider" position="attributes">
+                     <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field>
+                <field name="analytic_account_id" position="attributes">
+                     <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field>
+            </field>
+        </record>
+        <record id="view_building_public_utility_form_options" model="ir.ui.view">
+            <field name="name">view.building.public.utility.form.options</field>
+            <field name="model">building.public.utility</field>
+            <field name="inherit_id" ref="organisation_structure.view_building_public_utility_form" />
+            <field name="arch" type="xml">
+                <field name="type" position="attributes">
+                     <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field>
+                <field name="provider" position="attributes">
+                     <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field>
+                <field name="analytic_account_id" position="attributes">
                      <attribute name="options">{'create': false, 'create_edit': false}</attribute>
                 </field>
             </field>
