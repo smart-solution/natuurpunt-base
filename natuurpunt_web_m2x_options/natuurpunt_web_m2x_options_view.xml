@@ -701,7 +701,7 @@
         <record id="view_np_sale_order_form_options" model="ir.ui.view">
             <field name="name">view.np.sale.order.form.options</field>
             <field name="model">sale.order</field>
-            <field name="inherit_id" ref="natuurpunt_sale.view_np_sale_order_form" />
+            <field name="inherit_id" ref="multi_analytical_account.view_np_sale_order_form" />
             <field name="arch" type="xml">
                 <field name="analytic_dimension_1_id" position="attributes">
                      <attribute name="options">{'create': false, 'create_edit': false}</attribute>
