@@ -718,6 +718,32 @@
             </field>
         </record>	
 
+        <record id="view_sale_order_add_line_wizard_options" model="ir.ui.view">
+            <field name="name">Add.Sale.Order.Line.options</field>
+            <field name="model">sale.order.add.line</field>
+            <field name="inherit_id" ref="natuurpunt_sale.view_sale_order_add_line_wizard" />
+            <field name="arch" type="xml">
+                <field name="product_id" position="attributes">
+                     <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field>
+                <field name="product_uom" position="attributes">
+                     <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field>
+                <field name="tax_id" position="attributes">
+                     <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field>
+                <field name="analytic_dimension_1_id" position="attributes">
+                     <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field>
+                <field name="analytic_dimension_2_id" position="attributes">
+                     <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field>
+                <field name="analytic_dimension_3_id" position="attributes">
+                     <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field>
+            </field>
+        </record>
+
     </data>
 </openerp>
 
