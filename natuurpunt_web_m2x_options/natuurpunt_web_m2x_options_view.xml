@@ -686,13 +686,16 @@
             <field name="model">sale.order</field>
             <field name="inherit_id" ref="sale.view_order_form"/>
             <field name="arch" type="xml">
-                <field name="product_id" position="attributes">
-                     <attribute name="options">{'create': false, 'create_edit': false}</attribute>
-                </field>
-                <field name="product_uom" position="attributes">
-                     <attribute name="options">{'create': false, 'create_edit': false}</attribute>
-                </field>
-                <field name="tax_id" position="attributes">
+                <xpath expr="//field[@name='order_line']/tree//field[@name='product_id']" position="attributes">
+                     <attribute name="options">{'limit': 10, 'create': false, 'create_edit': false}</attribute>
+                </xpath>
+                <xpath expr="//field[@name='order_line']/tree//field[@name='product_uom']" position="attributes">
+                     <attribute name="options">{'limit': 10, 'create': false, 'create_edit': false}</attribute>
+                </xpath>
+                <xpath expr="//field[@name='order_line']/tree//field[@name='tax_id']" position="attributes">
+                     <attribute name="options">{'limit': 10, 'create': false, 'create_edit': false}</attribute>
+				 </xpath>
+                <field name="sales_person" position="attributes">
                      <attribute name="options">{'create': false, 'create_edit': false}</attribute>
                 </field>
             </field>
