@@ -695,7 +695,7 @@
                 <xpath expr="//field[@name='order_line']/tree//field[@name='tax_id']" position="attributes">
                      <attribute name="options">{'limit': 10, 'create': false, 'create_edit': false}</attribute>
 				 </xpath>
-                <field name="sales_person" position="attributes">
+                <field name="user_id" position="attributes">
                      <attribute name="options">{'create': false, 'create_edit': false}</attribute>
                 </field>
             </field>
