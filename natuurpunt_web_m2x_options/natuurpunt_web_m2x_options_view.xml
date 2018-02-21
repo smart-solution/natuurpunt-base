@@ -376,6 +376,17 @@
             </field>
         </record>
 
+        <record id="view_partner_form_inherit_options" model="ir.ui.view">
+            <field name="name">res.partner.form.inherit.options</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="membership.view_partner_form" />
+            <field name="arch" type="xml">
+                <field name="associate_member" position="attributes">
+                      <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field>
+            </field>
+        </record>
+
         <record id="view_partner_property_form_purchase_options" model="ir.ui.view">
             <field name="name">res.partner.purchase.property.form.purchase.options</field>
             <field name="model">res.partner</field>
@@ -445,21 +456,6 @@
                 <field name="property_account_payable" position="attributes">
                       <attribute name="options">{'create': false, 'create_edit': false}</attribute>
                 </field>
-                <field name="property_customer_cost_account" position="attributes">
-                      <attribute name="options">{'create': false, 'create_edit': false}</attribute>
-                </field>
-                <field name="property_supplier_cost_account" position="attributes">
-                      <attribute name="options">{'create': false, 'create_edit': false}</attribute>
-                </field>
-                <field name="third_payer_id" position="attributes">
-                      <attribute name="options">{'create': false, 'create_edit': false}</attribute>
-                </field>
-                <field name="membership_renewal_product_id" position="attributes">
-                      <attribute name="options">{'create': false, 'create_edit': false}</attribute>
-                </field>
-                <field name="associate_member" position="attributes">
-                      <attribute name="options">{'create': false, 'create_edit': false}</attribute>
-                </field>
                 <field name="recruiting_member_id" position="attributes">
                       <attribute name="options">{'create': false, 'create_edit': false}</attribute>
                 </field>
@@ -468,6 +464,28 @@
                 </field>
             </field>
         </record>
+
+        <record id="view_supplier_cost_accout_form_options" model="ir.ui.view">
+            <field name="name">view.supplier.cost.account.form.options</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="account_purchase_invoice_supplier_account.view_supplier_cost_accout_form" />
+            <field name="arch" type="xml">
+                <field name="property_supplier_cost_account" position="attributes">
+                      <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field>
+            </field>
+        </record>	
+
+        <record id="view_customer_cost_accout_form_options" model="ir.ui.view">
+            <field name="name">view.customer.cost.account.form.options</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="account_sale_invoice_customer_account.view_customer_cost_accout_form" />
+            <field name="arch" type="xml">
+                <field name="property_customer_cost_account" position="attributes">
+                      <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field>
+            </field>
+        </record> 
 
         <record id="view_natuurpunt_crm_partner_form_options2" model="ir.ui.view">
             <field name="name">view.natuurpunt.crm.partner.form.options2</field>
@@ -538,7 +556,37 @@
                 </field> 
                 <field name="analytic_account_id" position="attributes">
                      <attribute name="options">{'create': false, 'create_edit': false}</attribute>
-                </field>                
+                </field>    
+                <field name="building_function_id" position="attributes">
+                     <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field> 
+                <field name="building_resp_vzw" position="attributes">
+                     <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field> 
+                <field name="building_ownership_id" position="attributes">
+                     <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field> 
+                <field name="building_spatial_planning_id" position="attributes">
+                     <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field> 
+                <field name="building_heritage_id" position="attributes">
+                     <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field>       
+                <field name="building_resp_id" position="attributes">
+                     <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field>     
+                <field name="building_activa_nr" position="attributes">
+                     <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field> 
+                <field name="building_analytic_dimension_1_id" position="attributes">
+                     <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field> 
+                <field name="building_analytic_dimension_2_id" position="attributes">
+                     <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field> 
+                <field name="building_analytic_dimension_3_id" position="attributes">
+                     <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field>               
             </field>
         </record>
 
@@ -637,11 +685,127 @@
             <field name="model">res.partner</field>
             <field name="inherit_id" ref="natuurpunt_membership.natuurpunt_membership_partner_form" />
             <field name="arch" type="xml">
+                <field name="third_payer_id" position="attributes">
+                      <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field>
                 <field name="free_membership_class_id" position="attributes">
+                     <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field>
+                <field name="membership_renewal_product_id" position="attributes">
+                      <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field>
+            </field>
+        </record>
+
+        <record id="view_order_partner_form_np_options" model="ir.ui.view">
+            <field name="name">view.sale.order.partner.form.np.options</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="natuurpunt_sale_partner.view_order_partner_form_np" />
+            <field name="arch" type="xml">
+                <field name="partner_id" position="attributes">
+                     <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field>
+                <field name="customer_contact_id" position="attributes">
                      <attribute name="options">{'create': false, 'create_edit': false}</attribute>
                 </field>
             </field>
         </record>
+
+        <record id="view_order_form_options" model="ir.ui.view">
+            <field name="name">sale.order.form.options</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='order_line']/tree//field[@name='product_id']" position="attributes">
+                     <attribute name="options">{'limit': 10, 'create': false, 'create_edit': false}</attribute>
+                </xpath>
+                <xpath expr="//field[@name='order_line']/tree//field[@name='product_uom']" position="attributes">
+                     <attribute name="options">{'limit': 10, 'create': false, 'create_edit': false}</attribute>
+                </xpath>
+                <xpath expr="//field[@name='order_line']/tree//field[@name='tax_id']" position="attributes">
+                     <attribute name="options">{'limit': 10, 'create': false, 'create_edit': false}</attribute>
+				 </xpath>
+                <field name="user_id" position="attributes">
+                     <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field>
+            </field>
+        </record>
+
+        <record id="view_np_sale_order_form_options" model="ir.ui.view">
+            <field name="name">view.np.sale.order.form.options</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="multi_analytical_account.view_np_sale_order_form" />
+            <field name="arch" type="xml">
+                <field name="analytic_dimension_1_id" position="attributes">
+                     <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field>
+                <field name="analytic_dimension_2_id" position="attributes">
+                     <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field>
+                <field name="analytic_dimension_3_id" position="attributes">
+                     <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field>
+            </field>
+        </record>	
+
+        <record id="view_sale_order_add_line_wizard_options" model="ir.ui.view">
+            <field name="name">Add.Sale.Order.Line.options</field>
+            <field name="model">sale.order.add.line</field>
+            <field name="inherit_id" ref="natuurpunt_sale.view_sale_order_add_line_wizard" />
+            <field name="arch" type="xml">
+                <field name="product_id" position="attributes">
+                     <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field>
+                <field name="product_uom" position="attributes">
+                     <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field>
+                <field name="tax_id" position="attributes">
+                     <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field>
+                <field name="analytic_dimension_1_id" position="attributes">
+                     <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field>
+                <field name="analytic_dimension_2_id" position="attributes">
+                     <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field>
+                <field name="analytic_dimension_3_id" position="attributes">
+                     <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field>
+            </field>
+        </record>
+        <record id="view_building_insurance_form_options" model="ir.ui.view">
+            <field name="name">view.building.insurance.form.options</field>
+            <field name="model">building.insurance</field>
+            <field name="inherit_id" ref="organisation_structure.view_building_insurance_form" />
+            <field name="arch" type="xml">
+                <field name="type" position="attributes">
+                     <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field>
+                <field name="provider" position="attributes">
+                     <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field>
+                <field name="analytic_account_id" position="attributes">
+                     <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field>
+            </field>
+        </record>
+        <record id="view_building_public_utility_form_options" model="ir.ui.view">
+            <field name="name">view.building.public.utility.form.options</field>
+            <field name="model">building.public.utility</field>
+            <field name="inherit_id" ref="organisation_structure.view_building_public_utility_form" />
+            <field name="arch" type="xml">
+                <field name="type" position="attributes">
+                     <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field>
+                <field name="provider" position="attributes">
+                     <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field>
+                <field name="analytic_account_id" position="attributes">
+                     <attribute name="options">{'create': false, 'create_edit': false}</attribute>
+                </field>
+            </field>
+        </record>
+
     </data>
 </openerp>
 

@@ -35,6 +35,13 @@ openerp.web_remove_unlimited = function(instance) {
                 });
             }
         },
+        add_items: function(section_code, items) {
+            var self = this;
+            if ((self.getParent().model != 'sale.order' || section_code != 'print') && items) {
+                this.items[section_code].push.apply(this.items[section_code],items);
+                this.redraw();
+            }
+        },
         remove_export: function() {
             if (this.items['other']) {
                 var items_without_export = this.items['other'].filter(d => d.label != _t("Export"));
