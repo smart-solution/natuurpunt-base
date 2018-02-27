@@ -53,6 +53,20 @@ openerp.web_natuurpunt_contacten = function(instance) {
    });
    instance.web.form.widgets.add('natuurpunt_email', 'instance.web.form.NatuurpuntEmail');
 
+   instance.web.form.NatuurpuntCapakey = instance.web.form.FieldChar.extend({
+       template: "NatuurpuntCapakey",
+       init: function (view, code) {
+           this._super.apply(this,arguments);
+       },
+       start: function() {
+           this._super();
+           System.import('app.capakey/main')
+               .then((module) => { module.main(instance); })
+               .catch(function(err){ console.error(err); });
+       }
+   });
+   instance.web.form.widgets.add('natuurpunt_capakey', 'instance.web.form.NatuurpuntCapakey');
+
    instance.web.search.CustomFilters.include({
         append_filter: function(filter) {
             this._super.apply(this,arguments);
@@ -81,6 +95,9 @@ openerp.web_natuurpunt_contacten = function(instance) {
     });
     instance.web.form.FieldChar.include({
 		format_value: function (val, def) {
+            if(this.name == "attachment_ids" && val) {
+                val = val;
+            }
 			if(this.name == "acc_number" && val) {
 			    val = account_number_format(val);
 			}		    		
