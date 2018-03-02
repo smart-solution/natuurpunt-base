@@ -94,6 +94,14 @@ openerp.web_natuurpunt_contacten = function(instance) {
         },
     });
     instance.web.form.FieldChar.include({
+        parse_value: function (val, def) {
+            if(this.name == "product_qty" && val && val.indexOf('-') > -1) {
+                throw new Error(_.str.sprintf(_t("'%s' is not a correct float for product_qty"), value));
+            }
+            else {
+                return instance.web.parse_value(val, this, def);
+            }
+        },
 		format_value: function (val, def) {
             if(this.name == "attachment_ids" && val) {
                 val = val;
