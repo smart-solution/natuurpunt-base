@@ -60,7 +60,7 @@ def koalect_webservice(url,key):
             index = [item[0] for item in mem].index(id)
             return mem[index]
         except ValueError:
-            if mem and mem[-1][0] < id:
+            if (mem and mem[-1][0] < id) or (page and not mem):
                 return id
             else: # consume webservice
                 response = koalect_api(page[-1]+1 if page else 1,limit)
