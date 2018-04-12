@@ -26,12 +26,15 @@ import difflib
 from unidecode import unidecode
 from openerp import SUPERUSER_ID
 
-def sql_wrapper(sqlstat, method=None):
+def sql_wrapper(sqlstat, method=None, update=False):
     def execute_sql(cr):
         cr.execute(sqlstat)
         if method and method == 'dictfetchone':
             return cr.dictfetchone()
-        return cr.dictfetchall()
+        if not update:
+            return cr.dictfetchall()
+        else:
+            return True
     return execute_sql
 
 def compose(*functions):
