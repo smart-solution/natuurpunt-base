@@ -54,13 +54,15 @@ def koalect_webservice(url,key):
     page = []
     limit = 10
     headers = {'Authorization':key}
-    def get_data_from_mem_or_call_api(id,koalect_api):
+    def get_data_from_mem_or_call_api(id,koalect_api,depth=0):
+        if (depth > 20):
+            return -1
         # id in memoize
         try:
             index = [item[0] for item in mem].index(id)
             return mem[index]
         except ValueError:
-            if mem and mem[-1][0] < id:
+            if (mem and mem[-1][0] < id) or (page and not mem):
                 return id
             else: # consume webservice
                 response = koalect_api(page[-1]+1 if page else 1,limit)
@@ -68,7 +70,7 @@ def koalect_webservice(url,key):
                 data = [(d['id'], d) for d in koalect_data['data']]
                 mem.extend(data)
                 page.extend([koalect_data['page']])
-                return get_data_from_mem_or_call_api(id,koalect_api)
+                return get_data_from_mem_or_call_api(id,koalect_api,depth+1)
     def get_data(id):
         # support recursive call to get_data
         if isinstance( id, ( int, long ) ):
