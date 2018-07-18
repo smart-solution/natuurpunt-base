@@ -34,7 +34,8 @@ var DropOffInputComponent = (function () {
     DropOffInputComponent.prototype.ngOnInit = function () {
         var _this = this;
         //called after the constructor and called  after the first ngOnChanges()
-        this.url = 'http://alfresco:8080/alfresco/api/-default-/public/alfresco/versions/1/nodes/ed8c5424-d4a5-4362-bc99-4ea67ba3caf6/children';
+        //this.url = 'http://alfresco:8080/alfresco/api/-default-/public/alfresco/versions/1/nodes/ed8c5424-d4a5-4362-bc99-4ea67ba3caf6/children';
+        this.url = 'http://goud.natuurpunt.be:8081/alfresco/api/-default-/public/alfresco/versions/1/nodes/ed8c5424-d4a5-4362-bc99-4ea67ba3caf6/children'
         this.loadDocumentsToProcess(100).subscribe(function (totalItems) {
             console.log(totalItems);
             _this.visible.next(0);
