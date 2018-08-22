@@ -149,9 +149,8 @@ def match_with_existing_partner(obj,cr,uid,data):
        ]
     else:
        target_domain = [
-            ('street','=',vals['street']),
+            ('street','ilike',vals['street'] + ' ' + vals['street_nbr']),
             ('zip','=',vals['zip']),
-            ('street_nbr','=',vals['street_nbr']),
        ]
     partner = compose(
                 match_on_fullname,
