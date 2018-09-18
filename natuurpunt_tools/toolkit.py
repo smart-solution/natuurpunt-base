@@ -148,10 +148,16 @@ def match_with_existing_partner(obj,cr,uid,data):
             ('street_nbr','=',vals['street_nbr']),
        ]
     else:
-       target_domain = [
-            ('street','ilike',vals['street'] + ' ' + vals['street_nbr']),
-            ('zip','=',vals['zip']),
-       ]
+       if vals['street_nbr']:
+            target_domain = [
+                ('street','ilike',vals['street'] + ' ' + vals['street_nbr']),
+                ('zip','=',vals['zip']),
+           ]
+       else:
+           target_domain = [
+                ('street','ilike',vals['street']),
+                ('zip','=',vals['zip']),
+           ]
     partner = compose(
                 match_on_fullname,
                 match_names_seperatly,
