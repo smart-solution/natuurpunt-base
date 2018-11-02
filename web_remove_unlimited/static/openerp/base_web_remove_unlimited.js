@@ -39,7 +39,7 @@ openerp.web_remove_unlimited = function(instance) {
                     if (action && action.constructor == Object) {
                         // simple client side template functionality
                         // replace string in domain that start with $
-                        if (typeof action.domain.map === 'function')
+                        if (action.domain && typeof action.domain.map === 'function')
                             action.domain = action.domain.map(function (nested){
                                value = nested[2];
                                if (typeof value === 'string' || value instanceof String && value.startsWith('$')){
