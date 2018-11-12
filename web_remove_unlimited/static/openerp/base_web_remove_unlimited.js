@@ -8,6 +8,53 @@ openerp.web_remove_unlimited = function(instance) {
 
     var _t = instance.web._t;
 
+    instance.web.search.Input.include({
+        quick_filter: function () {
+           if (this.attrs.context)
+              return JSON.parse(this.attrs.context.replace(/\'/g, '"')).quick_filter;
+        },
+        now: function () {
+           var today = new Date();
+           return today.toISOString().substring(0, 7);
+        },
+    });
+
+    instance.web.search.FilterGroup.include({
+            start: function () {
+                var self = this
+                this.$el.on('click', 'li', function(event){                   
+                   event.stopPropagation();
+                   self.toggle_filter(event);
+                });
+                return $.when(null);
+            },
+            toggle_filter: function (e) {
+               if ($(e.target).is('li'))
+                  if ($(e.target).is('.quickfilter')) {  
+                     if ($(e.target).data('type') && $(e.target).data('type') == 'period') {
+                       var self = this;
+                       e.target.childNodes.forEach(function(currentValue, currentIndex, listObj){ 
+                         var period = currentValue.value.split("-").reverse().join("/");
+                         var domain = [new Array("period_id", "ilike", period)];
+                         var advanced_filter = [];
+                         advanced_filter.label = 'Periode bevat ' + period;
+                         advanced_filter.value = domain;
+                         var propositions = [advanced_filter];
+                         self.view.query.add({
+                           category: _t("Advanced"),
+                           values: propositions,
+                           field: {
+                              get_context: function () { },
+                              get_domain: function () { return domain;},
+                              get_groupby: function () { }
+                           }
+                         });
+                       });
+	             } /* period */
+                  } else this.toggle(this.filters[Number($(e.target).data('index'))]);
+            },
+    });
+
     instance.web.View.include({
 	    init: function(parent, dataset, view_id, options) {
                 var self = this;
