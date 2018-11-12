@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+<t t-extend="SearchView.filters">
+    <t t-jquery="t:first" t-operation="replace">
+          <t t-if="filter.quick_filter() === 'period'">
+             <ul class="onclick-menu-content">
+                <li class="quickfilter" data-type="period"><input id="period" type="month" name="period" t-att-value="filter.now()"/></li>
+             </ul>
+          </t>
+    </t>
+</t>
+
+</templates>
