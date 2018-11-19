@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+<t t-extend="mail.thread.message">
+    <t t-jquery="h1.oe_msg_title" t-operation="append">
+          <ul class="g2" t-if="widget.email_to">
+              <span>E-mail aan:</span>
+              <li t-foreach="widget.email_to" t-as="email_to">
+                  <t t-esc="email_to"/>
+              </li>
+              <li t-foreach="widget.email_cc" t-as="email_cc">
+                  <t t-esc="email_cc"/>
+              </li>
+          </ul> 
+    </t>
+</t>
+
+</templates>

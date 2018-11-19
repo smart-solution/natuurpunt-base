@@ -1,0 +1,8 @@
+.openerp .oe_mail .oe_msg .oe_msg_content .oe_msg_title .g2{ 
+    font-size: .75rem;
+    list-style-type: none;
+    color: #2a6379;
+}
+.openerp .oe_mail .oe_msg .oe_msg_content .oe_msg_title .g2 span{
+    color: black;
+}
