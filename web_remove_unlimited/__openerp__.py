@@ -14,4 +14,6 @@ removes unlimited pager option on res_partner list views
     'css': [],
     'auto_install': False,
     'web_preload': False,
+    'css': ['static/css/quickfilter.css'],
+    'qweb': ['static/xml/searchview_filters.xml'],
 }

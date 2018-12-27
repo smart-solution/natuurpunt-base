@@ -25,6 +25,7 @@ dialog resize
             'static/src/css/font-awesome.min.css'],
     'qweb': ['static/src/xml/uploader_template.xml',
              'static/src/xml/dropoff_template.xml',
-             'static/src/xml/email_template.xml'],
+             'static/src/xml/email_template.xml',
+             'static/src/xml/capakey_template.xml'],
     'auto_install': False,
 }

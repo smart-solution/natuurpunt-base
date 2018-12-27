@@ -8,6 +8,197 @@ openerp.web_remove_unlimited = function(instance) {
 
     var _t = instance.web._t;
 
+    instance.web.search.Input.include({
+        quick_filter: function () {
+           if (this.attrs.context)
+              return JSON.parse(this.attrs.context.replace(/\'/g, '"')).quick_filter;
+        },
+        now: function () {
+           var today = new Date();
+           return today.toISOString().substring(0, 7);
+        },
+    });
+
+    instance.web.search.FilterGroup.include({
+            start: function () {
+                var self = this
+                this.$el.on('click', 'li', function(event){                   
+                   event.stopPropagation();
+                   self.toggle_filter(event);
+                });
+                return $.when(null);
+            },
+            toggle_filter: function (e) {
+               if ($(e.target).is('li'))
+                  if ($(e.target).is('.quickfilter')) {  
+                     if ($(e.target).data('type') && $(e.target).data('type') == 'period') {
+                       var self = this;
+                       e.target.childNodes.forEach(function(currentValue, currentIndex, listObj){ 
+                         var period = currentValue.value.split("-").reverse().join("/");
+                         var domain = [new Array("period_id", "ilike", period)];
+                         var advanced_filter = [];
+                         advanced_filter.label = 'Periode bevat ' + period;
+                         advanced_filter.value = domain;
+                         var propositions = [advanced_filter];
+                         self.view.query.add({
+                           category: _t("Advanced"),
+                           values: propositions,
+                           field: {
+                              get_context: function () { },
+                              get_domain: function () { return domain;},
+                              get_groupby: function () { }
+                           }
+                         });
+                       });
+	             } /* period */
+                  } else this.toggle(this.filters[Number($(e.target).data('index'))]);
+            },
+    });
+
+    instance.web.View.include({
+	    init: function(parent, dataset, view_id, options) {
+                var self = this;
+                this._super.apply(this, arguments);
+	    },
+
+            /**
+             * Fetches and executes the action identified by ``action_data``.
+             *
+             * @param {Object} action_data the action descriptor data
+             * @param {String} action_data.name the action name, used to uniquely identify the action to find and execute it
+             * @param {String} [action_data.special=null] special action handlers (currently: only ``'cancel'``)
+             * @param {String} [action_data.type='workflow'] the action type, if present, one of ``'object'``, ``'action'`` or ``'workflow'``
+             * @param {Object} [action_data.context=null] additional action context, to add to the current context
+             * @param {instance.web.DataSet} dataset a dataset object used to communicate with the server
+             * @param {Object} [record_id] the identifier of the object on which the action is to be applied
+             * @param {Function} on_closed callback to execute when dialog is closed or when the action does not generate any result (no new action)
+             */
+            do_execute_action: function (action_data, dataset, record_id, on_closed) {
+                var self = this;
+                var result_handler = function () {
+                    if (on_closed) { on_closed.apply(null, arguments); }
+                    if (self.getParent() && self.getParent().on_action_executed) {
+                        return self.getParent().on_action_executed.apply(null, arguments);
+                    }
+                };
+                var context = new instance.web.CompoundContext(dataset.get_context(), action_data.context || {});
+                var handler = function (action) {
+                    if (action && action.constructor == Object) {
+                        // simple client side template functionality
+                        // replace string in domain that start with $
+                        if (action.domain && typeof action.domain.map === 'function')
+                            action.domain = action.domain.map(function (nested){
+                               value = nested[2];
+                               if (typeof value === 'string' || value instanceof String && value.startsWith('$')){
+                                  var key = value.slice(1).toLowerCase();
+                                  nested.splice(2,2,Object.keys(self.fields[key].display_value)[0]);
+                               }
+                               return nested;
+                            });
+                        // filter out context keys that are specific to the current action.
+                        // Wrong default_* and search_default_* values will no give the expected result
+                        // Wrong group_by values will simply fail and forbid rendering of the destination view
+                        var ncontext = new instance.web.CompoundContext(
+                            _.object(_.reject(_.pairs(dataset.get_context().eval()), function(pair) {
+                              return pair[0].match('^(?:(?:default_|search_default_).+|.+_view_ref|group_by|group_by_no_leaf|active_id|active_ids)$') !== null;
+                            }))
+                        );
+                        ncontext.add(action_data.context || {});
+                        ncontext.add({active_model: dataset.model});
+                        if (record_id) {
+                            ncontext.add({
+                                active_id: record_id,
+                                active_ids: [record_id],
+                            });
+                        }
+                        ncontext.add(action.context || {});
+                        action.context = ncontext;
+                        return self.do_action(action, {
+                            on_close: result_handler,
+                        });
+                    } else {
+                        self.do_action({"type":"ir.actions.act_window_close"});
+                        return result_handler();
+                    }
+                };
+                if (action_data.special === 'cancel') {
+                    return handler({"type":"ir.actions.act_window_close"});
+                } else if (action_data.type=="object") {
+                    var args = [[record_id]], additional_args = [];
+                    if (action_data.args) {
+                        try {
+                            // Warning: quotes and double quotes problem due to json and xml clash
+                            // Maybe we should force escaping in xml or do a better parse of the args array
+                            additional_args = JSON.parse(action_data.args.replace(/'/g, '"'));
+                            args = args.concat(additional_args);
+                        } catch(e) {
+                            console.error("Could not JSON.parse arguments", action_data.args);
+                        }
+                    }
+                    args.push(context);
+                    return dataset.call_button(action_data.name, args).then(handler).then(function () {
+                        if (instance.webclient) {
+                            instance.webclient.menu.do_reload_needaction();
+                        }
+                    });
+                } else if (action_data.type=="action") {
+                    return this.rpc('/web/action/load', {
+                        action_id: action_data.name,
+                        context: instance.web.pyeval.eval('context', context),
+                        do_not_eval: true
+                    }).then(handler);
+                } else  {
+                    return dataset.exec_workflow(record_id, action_data.name).then(handler);
+                }
+            },
+    });
+
+    instance.web.form.WidgetButton.include({
+        init: function(field_manager, node) {
+            var self = this;
+            var ret = this._super.apply(this, arguments);
+        },
+        execute_action: function() {
+            var self = this;
+            var exec_action = function() {
+                if (self.node.attrs.confirm) {
+                    var def = $.Deferred();
+                    var dialog = instance.web.dialog($('<div/>').text(self.node.attrs.confirm), {
+                        title: _t('Confirm'),
+                        modal: true,
+                        buttons: [
+                            {text: _t("Cancel"), click: function() {
+                                    $(this).dialog("close");
+                                }
+                            },
+                            {text: _t("Ok"), click: function() {
+                                    var self2 = this;
+                                    self.on_confirmed().always(function() {
+                                        $(self2).dialog("close");
+                                    });
+                                }
+                            }
+                        ],
+                        beforeClose: function() {
+                            def.resolve();
+                        },
+                    });
+                    return def.promise();
+                } else {
+                    return self.on_confirmed();
+                }
+            };
+            if (!this.node.attrs.special) {
+                if (this.node.attrs.name == 'redirect_to_purchase_order')
+                    return exec_action();
+                else
+                    return this.view.recursive_save().then(exec_action);
+            } else {
+                return exec_action();
+            }
+        },
+    });
+
     instance.web.Sidebar.include({
         init: function(parent) {
             var self = this;
