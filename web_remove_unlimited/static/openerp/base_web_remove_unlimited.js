@@ -34,7 +34,8 @@ openerp.web_remove_unlimited = function(instance) {
                      if ($(e.target).data('type') && $(e.target).data('type') == 'period') {
                        var self = this;
                        e.target.childNodes.forEach(function(currentValue, currentIndex, listObj){ 
-                         var period = currentValue.value.split("-").reverse().join("/");
+                         //var period = currentValue.value.split("-").reverse().join("/");
+                         var period = currentValue.value;
                          var domain = [new Array("period_id", "ilike", period)];
                          var advanced_filter = [];
                          advanced_filter.label = 'Periode bevat ' + period;
