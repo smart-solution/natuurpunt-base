@@ -10,8 +10,23 @@ openerp.web_remove_unlimited = function(instance) {
 
     instance.web.search.Input.include({
         quick_filter: function () {
-           if (this.attrs.context)
-              return JSON.parse(this.attrs.context.replace(/\'/g, '"')).quick_filter;
+           if (this.attrs.context) {
+              // preserve newlines, etc - use valid JSON
+              s = this.attrs.context.replace(/\\n/g, "\\n")  
+                   .replace(/\\'/g, "\\'")
+                   .replace(/\'/g, '"')
+                   .replace(/\\&/g, "\\&")
+                   .replace(/\\r/g, "\\r")
+                   .replace(/\\t/g, "\\t")
+                   .replace(/\\b/g, "\\b")
+                   .replace(/\\f/g, "\\f");
+              // remove non-printable and other non-valid JSON chars
+              s = s.replace(/[\u0000-\u0019]+/g,""); 
+              var regex = /True/gi;
+              // replace True => 1
+              s = s.replace(regex, '1')
+              return JSON.parse(s).quick_filter;
+           }
         },
         now: function () {
            var today = new Date();
