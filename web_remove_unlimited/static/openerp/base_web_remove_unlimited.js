@@ -25,6 +25,8 @@ openerp.web_remove_unlimited = function(instance) {
               var regex = /True/gi;
               // replace True => 1
               s = s.replace(regex, '1')
+	      regex = /False/gi;
+              s = s.replace(regex, '0')
               return JSON.parse(s).quick_filter;
            }
         },
