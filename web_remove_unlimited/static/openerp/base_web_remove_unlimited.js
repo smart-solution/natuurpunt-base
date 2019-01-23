@@ -109,7 +109,8 @@ openerp.web_remove_unlimited = function(instance) {
                                value = nested[2];
                                if (typeof value === 'string' || value instanceof String && value.startsWith('$')){
                                   var key = value.slice(1).toLowerCase();
-                                  nested.splice(2,2,Object.keys(self.fields[key].display_value)[0]);
+                                  if (self.fields[key].display_value)
+                                      nested.splice(2,2,Object.keys(self.fields[key].display_value)[0]);
                                }
                                return nested;
                             });
