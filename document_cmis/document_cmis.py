@@ -34,15 +34,16 @@ from functools import partial
 
 _logger = logging.getLogger(__name__)
 
-def setup_alfresco_rest_api(obj, cr, uid):
+def setup_alfresco_api(obj, cr, uid, api_base):
     conf_param_obj = obj.pool.get('ir.config_parameter')
-    server_url = conf_param_obj.get_param(cr, uid, 'document_cmis.rest_api')
+    server_url = conf_param_obj.get_param(cr, uid, api_base)
     if not server_url:
        raise osv.except_osv(_('Error!'),_("Cannot connect to the CMIS Server: No CMIS Server URL system property found"))
 
-    # basic auth credentials
-    user = obj.pool.get('res.users').browse(cr, uid, uid)
-    auth = (user.login, user.password)
+    # basic auth credentials    
+    user = conf_param_obj.get_param(cr, uid, 'document_cmis.user')
+    password =  conf_param_obj.get_param(cr, uid, 'document_cmis.password')
+    auth = (user,password)
 
     def api_call_wrapper(verb,rest_api_call,files=None,data=None):
         url = server_url + rest_api_call
@@ -84,10 +85,10 @@ def alfresco_repository_from_model(obj, cr, uid, vals, context=None):
     return (False,False)
 
 @contextmanager
-def alfresco_api_handler(obj, cr, uid):
+def alfresco_api_handler(obj, cr, uid, api_base):
     try:
-        alfresco_rest_api = setup_alfresco_rest_api(obj, cr, uid)
-        yield alfresco_rest_api
+        alfresco_api = setup_alfresco_api(obj, cr, uid, api_base)
+        yield alfresco_api
     except requests.exceptions.Timeout:
         # Maybe set up for a retry, or continue in a retry loop
         raise osv.except_osv(_("Error!"),_("CMIS Server: Timeout"))
@@ -101,15 +102,19 @@ def alfresco_api_handler(obj, cr, uid):
         _logger.exception(err)
         raise osv.except_osv(_("HTTPError!"),_(err))
 
-def attach_document_from_dropoff_folder(api,vals):
+def attach_document_from_dropoff_folder(api,np_api,vals):
     return compose(partial(check_root_folder,api),
+                   partial(check_permissions_root_folder,np_api),
                    partial(get_target_folder,api),
-                   partial(move_from_dropoff_folder_to_target_folder,api))(vals)
+                   partial(move_from_dropoff_folder_to_target_folder,api),
+                   partial(set_owner,np_api))(vals)
 
-def attach_document_from_disk(api,vals):
+def attach_document_from_disk(api,np_api,vals):
     return compose(partial(check_root_folder,api),
+                   partial(check_permissions_root_folder,np_api),
                    partial(get_target_folder,api),
-                   partial(upload_file_from_disk,api))(vals)
+                   partial(upload_file_from_disk,api),
+                   partial(set_owner,np_api))(vals)
 
 def rename_draft_invoice_folder(api,vals):
     return compose(partial(check_root_folder,api),
@@ -119,6 +124,18 @@ def check_root_folder(api,vals):
     # check if directory exists on cmis server
     response = api('GET',nodes.node(vals['cmis_object_id']))
     return vals
+
+def check_permissions_root_folder(api,vals):
+    # check if directory permissions on cmis server
+    response = api('GET',nodes.check_permission(vals['cmis_object_id'],vals['user']))
+    if response.json()['permissions']['allowed'] == 'no':
+        raise osv.except_osv(_("Error!"),_("Access denied"))
+    return vals
+
+def set_owner(api,vals):
+    # change the owner 
+    response = api('PUT',nodes.set_owner(vals['created_object_id'],vals['user']))
+    return vals['created_object_id']
 
 def get_target_folder(api,vals):
     response = api('GET',nodes.queries(vals['cmis_object_id'],vals['target_folder']))
@@ -149,7 +166,8 @@ def rename_draft_folder_to_target_folder(api,vals):
 def move_from_dropoff_folder_to_target_folder(api,vals):
     request_body = json.dumps({'targetParentId':vals['target_folder_id']})
     response = api('POST',nodes.move(vals['object_id']),data=request_body)
-    return response
+    vals['created_object_id'] = vals['object_id']
+    return vals
 
 def upload_file_from_disk(api,vals):
     fname = vals['datas_fname']
@@ -166,12 +184,13 @@ def upload_file_from_disk(api,vals):
        response = api('POST',node,files={'filedata': fdata})
     #renaming it to the original name
     object_id = response.json()['entry']['id']
+    vals['created_object_id'] = object_id
     node_rename = nodes.node(object_id)
     request_body = json.dumps({'name':fname})
     response = api('PUT',node_rename,data=request_body)
-    return response
+    return vals
 
-class account_invoice(osv.osv):
+class account_invoice(osv.osv):	
 
     _inherit = "account.invoice"
 
@@ -187,7 +206,7 @@ class account_invoice(osv.osv):
                         'draft_folder':invoice.id,
                         'target_folder':invoice.internal_number,
                     }
-                    with alfresco_api_handler(self, cr, uid) as api:
+                    with alfresco_api_handler(self, cr, uid, 'document_cmis.rest_api') as api:
                         response = rename_draft_invoice_folder(api,cmis_vals)
         return res
 
@@ -247,19 +266,23 @@ class ir_attachment(osv.osv):
            if self.search(cr, uid, [('name','=',vals['name']),('res_id','=',vals['res_id'])]):
               raise osv.except_osv(_("Error!"),_("A document already exists with the same name for this ressource (model:%s / id:%s)"%(vals['res_model'],vals['res_id'])))
 
-           with alfresco_api_handler(self, cr, uid) as api:
+           user = self.pool.get('res.users').browse(cr, uid, uid)
+           cmis_vals['user'] = user.login
+
+           with alfresco_api_handler(self,cr,uid,'document_cmis.rest_api') as api, \
+                alfresco_api_handler(self,cr,uid,'document_cmis.natuurpunt_api') as np_api:
               if 'object_id' in cmis_vals:
-                  response = attach_document_from_dropoff_folder(api,cmis_vals)
+                  created_object_id = attach_document_from_dropoff_folder(api,np_api,cmis_vals)
               else:
-                  response = attach_document_from_disk(api,cmis_vals)
+                  created_object_id = attach_document_from_disk(api,np_api,cmis_vals)
 
            #Get the cmis object id and store it in the attachment
            protocol = 'workspace://SpacesStore/'
            link_url = self.pool.get('ir.config_parameter').get_param(cr, uid, 'document_cmis.server_link_url')
-           url = link_url + protocol + response.json()['entry']['id']
+           url = link_url + protocol + created_object_id
            vals['type'] = 'url'
            vals['url'] = url
-           vals['cmis_object_id'] = protocol + response.json()['entry']['id']
+           vals['cmis_object_id'] = protocol + created_object_id
            vals['db_datas'] = ""
 
         else:
@@ -274,7 +297,7 @@ class ir_attachment(osv.osv):
         for doc in self.pool.get('ir.attachment').browse(cr, uid, ids):
             if doc.type == 'url':
                cmis_object_id = doc.cmis_object_id.split('/')[-1]
-               with alfresco_api_handler(self, cr, uid) as api:
+               with alfresco_api_handler(self, cr, uid, 'document_cmis.rest_api') as api:
                   response = api('DELETE',nodes.node(cmis_object_id))
 
         return super(ir_attachment, self).unlink(cr, uid, ids, context=context)
