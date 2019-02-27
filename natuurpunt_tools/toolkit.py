@@ -134,7 +134,7 @@ def match_with_existing_partner(obj,cr,uid,data):
                          lambda f,l : f >= 0.7 and l >= 0.85] # seperate firstname/lastname
                 res = [func(cmp_res_first_name[1],cmp_res_last_name[1]) for func in rules]
                 # return partner,full match or partial match
-                return (partner,res[0]) if any(res) else (False,False)
+                return (partner,True) if any(res) else (False,False)
             else:
                 return (False,False)
         else:
