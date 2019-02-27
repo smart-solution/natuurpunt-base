@@ -158,14 +158,15 @@ def match_with_existing_partner(obj,cr,uid,data):
                 ('street','ilike',vals['street']),
                 ('zip','=',vals['zip']),
            ]
-    partner = compose(
-                match_on_fullname,
-                match_names_seperatly,
-                lambda (p,full_match): p if p and (not(p.donation_line_ids) or full_match) else False
-              )(obj.search(cr,uid,target_domain))
+    partner,full_match = compose(
+        match_on_fullname,
+        match_names_seperatly,
+        lambda (p,full_match): (p if p and (not(p.donation_line_ids) or full_match),full_match) else (False,full_match)
+    )(obj.search(cr,uid,target_domain))
     log = {
         'alert':[alert] if partner else [],
-        'renewal':False
+        'renewal':False,
+        'full_match':full_match
     }
     return (partner if partner else False, vals, log)
 
