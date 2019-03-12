@@ -5,6 +5,7 @@ var packages = {
   "app.email": { defaultExtension: "js" },
   "app.alfresco.dropoff": { defaultExtension: "js" },
   "app.capakey": { defaultExtension: "js" },
+  "app.geopunt": { defaultExtension: "js" },
 };
 
 // Tell Angular how normalize path and package aliases.
@@ -36,6 +37,7 @@ var packages = {
      'app.alfresco.dropoff': './web_natuurpunt_contacten/static/src/js/app.alfresco.dropoff',
      'app.email': './web_natuurpunt_contacten/static/src/js/app.email',
      'app.capakey': './web_natuurpunt_contacten/static/src/js/app.capakey',
+     'app.geopunt': './web_natuurpunt_contacten/static/src/js/app.geopunt',
  };
 
 var packageNames = [
