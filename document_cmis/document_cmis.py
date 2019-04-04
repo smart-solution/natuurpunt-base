@@ -137,6 +137,17 @@ def set_owner(api,vals):
     response = api('PUT',nodes.set_owner(vals['created_object_id'],vals['user']))
     return vals['created_object_id']
 
+def get_name_filesize(api,vals):
+    # get name and filesize of alfresco object ID
+    response = api('GET',nodes.node(vals['cmis_object_id']))
+    entry = response.json()['entry']
+    return entry['name'],entry['content']['sizeInBytes']
+
+def download(api,vals):
+    name,file_size = get_name_filesize(api,vals)
+    response = api('GET',nodes.download(vals['cmis_object_id']))
+    return (name, response.content.encode('base64'))
+
 def get_target_folder(api,vals):
     response = api('GET',nodes.queries(vals['cmis_object_id'],vals['target_folder']))
     query_res = [entry['entry'] for entry in response.json()['list']['entries']]
@@ -294,7 +305,7 @@ class ir_attachment(osv.osv):
 
     def unlink(self, cr, uid, ids, context=None):
         """Delete the cmis document when a ressource is deleted"""
-        for doc in self.pool.get('ir.attachment').browse(cr, uid, ids):
+        for doc in self.browse(cr, uid, ids):
             if doc.type == 'url':
                cmis_object_id = doc.cmis_object_id.split('/')[-1]
                with alfresco_api_handler(self, cr, uid, 'document_cmis.rest_api') as api:
@@ -302,6 +313,25 @@ class ir_attachment(osv.osv):
 
         return super(ir_attachment, self).unlink(cr, uid, ids, context=context)
 
+    def alfresco_file_properties(self, cr, uid, ids, context=None):
+        properties = []
+	for doc in self.browse(cr, uid, ids):
+            if doc.type == 'url':
+               vals = {}
+               vals['cmis_object_id'] = doc.cmis_object_id.split('/')[-1]
+               with alfresco_api_handler(self, cr, uid, 'document_cmis.rest_api') as api:
+                   properties.append(get_name_filesize(api,vals))
+        return properties
+
+    def get_alfresco_files(self, cr, uid, ids, context=None):
+        alfresco_files = []
+        for doc in self.browse(cr, uid, ids):
+            if doc.type == 'url':
+               vals = {}
+               vals['cmis_object_id'] = doc.cmis_object_id.split('/')[-1]
+               with alfresco_api_handler(self, cr, uid, 'document_cmis.rest_api') as api:
+                   alfresco_files.append(download(api,vals))
+        return alfresco_files
 
 class document_directory(osv.osv):
 
