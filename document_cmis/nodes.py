@@ -34,4 +34,7 @@ def check_permission(id, user):
 def set_owner(id, user):
     return '/setowner/{}/{}'.format(id,user)
 
+def download(id):
+    return '/nodes/{}/content'.format(id)
+
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
