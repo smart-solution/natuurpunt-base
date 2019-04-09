@@ -29,10 +29,10 @@ def move(id):
     return '/nodes/{}/move'.format(id)
 
 def check_permission(id, user):
-    return '/checkpermission/{}/{}'.format(id,user)
+    return '/checkpermission/{}/{}/'.format(id,user)
 
 def set_owner(id, user):
-    return '/setowner/{}/{}'.format(id,user)
+    return '/setowner/{}/{}/'.format(id,user)
 
 def download(id):
     return '/nodes/{}/content'.format(id)
