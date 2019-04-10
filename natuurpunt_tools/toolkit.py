@@ -134,11 +134,11 @@ def match_with_existing_partner(obj,cr,uid,data):
                          lambda f,l : f >= 0.7 and l >= 0.85] # seperate firstname/lastname
                 res = [func(cmp_res_first_name[1],cmp_res_last_name[1]) for func in rules]
                 # return partner,full match or partial match
-                return (partner,True) if any(res) else (False,False)
+                return partner if any(res) else False
             else:
-                return (False,False)
+                return False
         else:
-            return (False,False)
+            return False
 
     ref_vals = get_match_vals(vals)
     if 'street_id' in vals and vals['street_id']:
@@ -158,15 +158,14 @@ def match_with_existing_partner(obj,cr,uid,data):
                 ('street','ilike',vals['street']),
                 ('zip','=',vals['zip']),
            ]
-    partner,full_match = compose(
+    partner = compose(
         match_on_fullname,
         match_names_seperatly,
-        lambda (p,full_match): (p if p and (not(p.donation_line_ids) or full_match) else False,full_match)
+        lambda p: p if p else False
     )(obj.search(cr,uid,target_domain))
     log = {
         'alert':[alert] if partner else [],
         'renewal':False,
-        'full_match':full_match
     }
     return (partner if partner else False, vals, log)
 
