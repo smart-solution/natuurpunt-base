@@ -115,13 +115,13 @@ def match_with_existing_partner(obj,cr,uid,data):
 
     def match_names_seperatly(cmp_res):
         """
-        return tuple partner object,boolean full match
+        return partner object,vals, log
         """
         logger.info("partner fullname match diff:{}".format(cmp_res))
         if cmp_res:
             partner = obj.browse(cr,uid,cmp_res[0])
             if cmp_res[1] == 1.0:
-                return (partner,True)
+                return partner
             if cmp_res[1] > 0.5:
                 first_name = partner.first_name if partner.first_name else ''
                 cmp_res_first_name = difflib_cmp(ref_vals.first_name, [(partner.id, first_name)])[0]
