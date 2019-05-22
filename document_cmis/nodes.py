@@ -22,6 +22,9 @@ def queries(id, term):
 def children(id):
     return '/nodes/{}/children'.format(id)
 
+def children_is_folder(id):
+    return '/nodes/{}/children?orderBy=createdAt DESC&where=(isFolder=true)'.format(id)
+
 def node(id):
     return '/nodes/{}'.format(id)
 

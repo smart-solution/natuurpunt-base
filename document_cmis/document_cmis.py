@@ -149,16 +149,27 @@ def download(api,vals):
     return (name, response.content.encode('base64'))
 
 def get_target_folder(api,vals):
-    response = api('GET',nodes.queries(vals['cmis_object_id'],vals['target_folder']))
+    """
+    first get 100 recent folders to check if target_folder exists
+    if not, second search the index which has latentcy and maybe can't see a recent 
+    created folder. This should be detected by the first 100 recent folders
+    """
+    response = api('GET',nodes.children_is_folder(vals['cmis_object_id']))
     query_res = [entry['entry'] for entry in response.json()['list']['entries']]
-    if not(any([r['isFolder'] for r in query_res]) if query_res else False):
-       folder = {"nodeType":"cm:folder"}
-       folder['name'] = vals['target_folder']
-       request_body = json.dumps(folder)
-       response = api('POST',nodes.children(vals['cmis_object_id']),data=request_body)
-       vals['target_folder_id'] = response.json()['entry']['id']
+    folders = [{q['name']:q['id']} for q in query_res]
+    if not any([vals['target_folder'] in d for d in folders]):
+       response = api('GET',nodes.queries(vals['cmis_object_id'],vals['target_folder']))
+       query_res = [entry['entry'] for entry in response.json()['list']['entries']]
+       if not(any([r['isFolder'] for r in query_res]) if query_res else False):
+           folder = {"nodeType":"cm:folder"}
+           folder['name'] = vals['target_folder']
+           request_body = json.dumps(folder)
+           response = api('POST',nodes.children(vals['cmis_object_id']),data=request_body)
+           vals['target_folder_id'] = response.json()['entry']['id']
+       else:
+           vals['target_folder_id'] = [r['id'] for r in query_res if r['isFolder']][0]
     else:
-       vals['target_folder_id'] = [r['id'] for r in query_res if r['isFolder']][0]
+       vals['target_folder_id'] = [d for d in folders if vals['target_folder'] in d][0][vals['target_folder']]
     return vals
 
 def rename_draft_folder_to_target_folder(api,vals):
