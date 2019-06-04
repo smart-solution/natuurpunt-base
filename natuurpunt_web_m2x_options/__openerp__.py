@@ -40,6 +40,7 @@
         "organisation_structure",
         "multi_analytical_account",
         "natuurpunt_purchase",
+        "natuurpunt_purchase_search",
         "partner_inactive",
         "analytic",
         "purchase_requisition",
