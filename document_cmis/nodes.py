@@ -22,6 +22,9 @@ def queries(id, term):
 def children(id):
     return '/nodes/{}/children'.format(id)
 
+def children_is_folder(id):
+    return '/nodes/{}/children?orderBy=createdAt DESC&where=(isFolder=true)'.format(id)
+
 def node(id):
     return '/nodes/{}'.format(id)
 
@@ -29,9 +32,12 @@ def move(id):
     return '/nodes/{}/move'.format(id)
 
 def check_permission(id, user):
-    return '/checkpermission/{}/{}'.format(id,user)
+    return '/checkpermission/{}/{}/'.format(id,user)
 
 def set_owner(id, user):
-    return '/setowner/{}/{}'.format(id,user)
+    return '/setowner/{}/{}/'.format(id,user)
+
+def download(id):
+    return '/nodes/{}/content'.format(id)
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

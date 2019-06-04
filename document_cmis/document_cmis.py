@@ -137,17 +137,39 @@ def set_owner(api,vals):
     response = api('PUT',nodes.set_owner(vals['created_object_id'],vals['user']))
     return vals['created_object_id']
 
+def get_name_filesize(api,vals):
+    # get name and filesize of alfresco object ID
+    response = api('GET',nodes.node(vals['cmis_object_id']))
+    entry = response.json()['entry']
+    return entry['name'],entry['content']['sizeInBytes']
+
+def download(api,vals):
+    name,file_size = get_name_filesize(api,vals)
+    response = api('GET',nodes.download(vals['cmis_object_id']))
+    return (name, response.content.encode('base64'))
+
 def get_target_folder(api,vals):
-    response = api('GET',nodes.queries(vals['cmis_object_id'],vals['target_folder']))
+    """
+    first get 100 recent folders to check if target_folder exists
+    if not, second search the index which has latentcy and maybe can't see a recent 
+    created folder. This should be detected by the first 100 recent folders
+    """
+    response = api('GET',nodes.children_is_folder(vals['cmis_object_id']))
     query_res = [entry['entry'] for entry in response.json()['list']['entries']]
-    if not(any([r['isFolder'] for r in query_res]) if query_res else False):
-       folder = {"nodeType":"cm:folder"}
-       folder['name'] = vals['target_folder']
-       request_body = json.dumps(folder)
-       response = api('POST',nodes.children(vals['cmis_object_id']),data=request_body)
-       vals['target_folder_id'] = response.json()['entry']['id']
+    folders = [{q['name']:q['id']} for q in query_res]
+    if not any([vals['target_folder'] in d for d in folders]):
+       response = api('GET',nodes.queries(vals['cmis_object_id'],vals['target_folder']))
+       query_res = [entry['entry'] for entry in response.json()['list']['entries']]
+       if not(any([r['isFolder'] for r in query_res]) if query_res else False):
+           folder = {"nodeType":"cm:folder"}
+           folder['name'] = vals['target_folder']
+           request_body = json.dumps(folder)
+           response = api('POST',nodes.children(vals['cmis_object_id']),data=request_body)
+           vals['target_folder_id'] = response.json()['entry']['id']
+       else:
+           vals['target_folder_id'] = [r['id'] for r in query_res if r['isFolder']][0]
     else:
-       vals['target_folder_id'] = [r['id'] for r in query_res if r['isFolder']][0]
+       vals['target_folder_id'] = [d for d in folders if vals['target_folder'] in d][0][vals['target_folder']]
     return vals
 
 def rename_draft_folder_to_target_folder(api,vals):
@@ -294,7 +316,7 @@ class ir_attachment(osv.osv):
 
     def unlink(self, cr, uid, ids, context=None):
         """Delete the cmis document when a ressource is deleted"""
-        for doc in self.pool.get('ir.attachment').browse(cr, uid, ids):
+        for doc in self.browse(cr, uid, ids):
             if doc.type == 'url':
                cmis_object_id = doc.cmis_object_id.split('/')[-1]
                with alfresco_api_handler(self, cr, uid, 'document_cmis.rest_api') as api:
@@ -302,6 +324,25 @@ class ir_attachment(osv.osv):
 
         return super(ir_attachment, self).unlink(cr, uid, ids, context=context)
 
+    def alfresco_file_properties(self, cr, uid, ids, context=None):
+        properties = []
+	for doc in self.browse(cr, uid, ids):
+            if doc.type == 'url':
+               vals = {}
+               vals['cmis_object_id'] = doc.cmis_object_id.split('/')[-1]
+               with alfresco_api_handler(self, cr, uid, 'document_cmis.rest_api') as api:
+                   properties.append(get_name_filesize(api,vals))
+        return properties
+
+    def get_alfresco_files(self, cr, uid, ids, context=None):
+        alfresco_files = []
+        for doc in self.browse(cr, uid, ids):
+            if doc.type == 'url':
+               vals = {}
+               vals['cmis_object_id'] = doc.cmis_object_id.split('/')[-1]
+               with alfresco_api_handler(self, cr, uid, 'document_cmis.rest_api') as api:
+                   alfresco_files.append(download(api,vals))
+        return alfresco_files
 
 class document_directory(osv.osv):
 

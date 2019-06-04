@@ -115,13 +115,13 @@ def match_with_existing_partner(obj,cr,uid,data):
 
     def match_names_seperatly(cmp_res):
         """
-        return tuple partner object,boolean full match
+        return partner object,vals, log
         """
         logger.info("partner fullname match diff:{}".format(cmp_res))
         if cmp_res:
             partner = obj.browse(cr,uid,cmp_res[0])
             if cmp_res[1] == 1.0:
-                return (partner,True)
+                return partner
             if cmp_res[1] > 0.5:
                 first_name = partner.first_name if partner.first_name else ''
                 cmp_res_first_name = difflib_cmp(ref_vals.first_name, [(partner.id, first_name)])[0]
@@ -134,11 +134,11 @@ def match_with_existing_partner(obj,cr,uid,data):
                          lambda f,l : f >= 0.7 and l >= 0.85] # seperate firstname/lastname
                 res = [func(cmp_res_first_name[1],cmp_res_last_name[1]) for func in rules]
                 # return partner,full match or partial match
-                return (partner,res[0]) if any(res) else (False,False)
+                return partner if any(res) else False
             else:
-                return (False,False)
+                return False
         else:
-            return (False,False)
+            return False
 
     ref_vals = get_match_vals(vals)
     if 'street_id' in vals and vals['street_id']:
@@ -159,13 +159,13 @@ def match_with_existing_partner(obj,cr,uid,data):
                 ('zip','=',vals['zip']),
            ]
     partner = compose(
-                match_on_fullname,
-                match_names_seperatly,
-                lambda (p,full_match): p if p and (not(p.donation_line_ids) or full_match) else False
-              )(obj.search(cr,uid,target_domain))
+        match_on_fullname,
+        match_names_seperatly,
+        lambda p: p if p else False
+    )(obj.search(cr,uid,target_domain))
     log = {
         'alert':[alert] if partner else [],
-        'renewal':False
+        'renewal':False,
     }
     return (partner if partner else False, vals, log)
 

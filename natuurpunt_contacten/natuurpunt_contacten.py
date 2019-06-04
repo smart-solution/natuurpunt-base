@@ -37,6 +37,16 @@ class account_analytic_account(osv.osv):
 
 account_analytic_account()
 
+class ir_attachment(osv.osv):
+    _inherit = 'ir.attachment'
+
+    def _search(self, cr, user, args, offset=0, limit=None, order=None, context=None, count=False, access_rights_uid=None):
+        context = dict(context or {}, active_test=False)
+        return super(ir_attachment, self)._search(cr, user, args, offset=offset, limit=limit, order=order, context=context,
+                                                count=count, access_rights_uid=access_rights_uid)
+
+ir_attachment()
+
 class res_partner(osv.osv):
     _inherit = 'res.partner'
 

@@ -48,6 +48,7 @@ def filter_columns(model, all_columns):
             'crm_move_ids',
             'credit_limit',
             'payment_amount_due',
+            'message_follower_ids',
             #'bank_ids',
         ]
         return {k:v for k, v in all_columns.items() if k not in non_audittrail_fields}
