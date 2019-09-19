@@ -17,10 +17,38 @@
 ##############################################################################
 
 import openerp
+import simplejson
+import base64
+import logging
+import xmlrpclib
+
+_logger = logging.getLogger(__name__)
 
 class Binary(openerp.addons.web.controllers.main.Binary):
     _cp_path = '/web_natuurpunt_multi_attach/binary'
 
     @openerp.addons.web.http.httprequest
-    def upload_attachment(self, req, callback, model, id, ufile):
-        return super(Binary, self).upload_attachment(req, callback, model, id, ufile)
+    def upload_attachment(self, req, callback, model, id, ufile0, **kwargs):
+         def create_attachment(ufile):
+             try:
+                 attachment_id = Model.create({
+                     'name': ufile.filename,
+                     'datas': base64.encodestring(ufile.read()),
+                     'datas_fname': ufile.filename,
+                     'res_model': model,
+                     'res_id': int(id)
+                 }, req.context)
+             except xmlrpclib.Fault, e:
+                 return {'error':e.faultCode }
+             return {
+                 'filename': ufile.filename,
+                 'id': attachment_id     
+             }
+
+         Model = req.session.model('ir.attachment')
+         response = []
+         response.append(create_attachment(ufile0))
+         if kwargs:
+             for key, ufile in kwargs.items():
+                 response.append(create_attachment(ufile))
+         return '%s' % simplejson.dumps(response)
