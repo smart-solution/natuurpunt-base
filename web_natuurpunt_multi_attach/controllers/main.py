@@ -45,10 +45,17 @@ class Binary(openerp.addons.web.controllers.main.Binary):
                  'id': attachment_id     
              }
 
+         def check_response_for_errors(response):
+             err = [d for d in response if 'error' in d]
+             if err:
+                 return err[0]
+             else:
+                 return [d for d in response if not 'error' in d]
+
          Model = req.session.model('ir.attachment')
          response = []
          response.append(create_attachment(ufile0))
          if kwargs:
              for key, ufile in kwargs.items():
                  response.append(create_attachment(ufile))
-         return '%s' % simplejson.dumps(response)
+         return '%s' % simplejson.dumps( check_response_for_errors(response) )

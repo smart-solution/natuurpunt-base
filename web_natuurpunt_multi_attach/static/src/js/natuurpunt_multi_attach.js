@@ -42,7 +42,8 @@ openerp.web_natuurpunt_multi_attach = function (session) {
                    if (request.readyState === 4) {
                      if (request.status === 200) {
                      // Code here for the server answer when successful
-                         $(window).trigger(callback.defaultValue,this.response);
+                         var response = jQuery.parseJSON(this.response);
+                         $(window).trigger(callback.defaultValue,response);
                      } else {
                      // Code here for the server answer when not successful
                          console.log(e);
