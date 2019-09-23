@@ -47,10 +47,7 @@ class Binary(openerp.addons.web.controllers.main.Binary):
 
          def check_response_for_errors(response):
              err = [d for d in response if 'error' in d]
-             if err:
-                 return err[0]
-             else:
-                 return [d for d in response if not 'error' in d]
+             return err[0] if err else response
 
          Model = req.session.model('ir.attachment')
          response = []
