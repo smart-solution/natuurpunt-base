@@ -298,6 +298,7 @@ class view_with_page(osv.osv):
                   values['modules'] = ','.join(modules)
               del values['module']
               page_ids.append(self.pool.get('ir.ui.view.page').create(cr,uid,values)) 
+          modules = []
           for prev,current in neighborhood(sorted(pages, key=lambda k: (k['name'], k['seq']))):
               if prev and prev['name'] <> current['name']:
                   create_page_record(prev)
@@ -310,8 +311,6 @@ class view_with_page(osv.osv):
               else:
                   changes = 0
                   modules = [current['module']]
-          else:
-              current = False
-          if current:
+          if modules:
               create_page_record(current)
           self.write(cr,uid,ids,{'page_ids':[(6,0,page_ids)]})
