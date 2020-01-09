@@ -23,10 +23,10 @@
     "website" : "www.natuurpunt.be",
     "category" : "Base extention",
     "description": """
-    test
+    tab pages management
 """,
     "depends" : ["base",],   
-    "data" : ["natuurpunt_ir_ui_view_page_view.xml","natuurpunt_ir_ui_view_page_cron.xml",],
+    "data" : ["natuurpunt_ir_ui_view_page_view.xml","natuurpunt_ir_ui_view_page_cron.xml","security/ir.model.access.csv",],
     "init_xml" : [],
     "update_xml" : [],
     "active": False,
