@@ -237,7 +237,11 @@ class ir_attachment(osv.osv):
     _inherit = 'ir.attachment'
 
     def _data_get(self, cr, uid, ids, name, arg, context=None):
-        return super(ir_attachment, self)._data_get(cr, uid, ids, name, arg, context=context)
+        res = super(ir_attachment, self)._data_get(cr, uid, ids, name, arg, context=context)
+        if res[ids[0]] == False:
+            cmis_res = self.download_from_alfresco(cr, uid, ids, context=context)
+            res[ids[0]] = cmis_res[1]
+        return res
 
     def _data_set(self, cr, uid, id, name, value, arg, context=None):
         # We dont handle setting data to null
@@ -263,6 +267,7 @@ class ir_attachment(osv.osv):
 
         # For Static directories, of a CMIS Object ID is specified, it put all files in that directory (IOW, it does not create subdirs)
         # For Folders per ressources, search if the ressource directory exists or creates it
+
         if directory and directory.type == "ressource":
 
            vals['cmis_object_id'] = directory.cmis_object_id.split('/')[-1]
@@ -318,6 +323,11 @@ class ir_attachment(osv.osv):
         """Delete the cmis document when a ressource is deleted"""
         for doc in self.browse(cr, uid, ids):
             if doc.type == 'url':
+               # check if doc is sent  
+               if doc.res_model == 'account.invoice':
+                  for invoice in self.pool.get(doc.res_model).browse(cr, uid, [doc.res_id]):
+                      if invoice.sent:
+                          raise osv.except_osv(_('Error!'),_("Document has been sent!"))
                cmis_object_id = doc.cmis_object_id.split('/')[-1]
                with alfresco_api_handler(self, cr, uid, 'document_cmis.rest_api') as api:
                   response = api('DELETE',nodes.node(cmis_object_id))
@@ -343,6 +353,14 @@ class ir_attachment(osv.osv):
                with alfresco_api_handler(self, cr, uid, 'document_cmis.rest_api') as api:
                    alfresco_files.append(download(api,vals))
         return alfresco_files
+
+    def download_from_alfresco(self, cr, uid, ids, context=None):
+        for doc in self.browse(cr, uid, ids):
+            if doc.type == 'url':
+               vals = {}
+               vals['cmis_object_id'] = doc.cmis_object_id.split('/')[-1]
+               with alfresco_api_handler(self, cr, uid, 'document_cmis.rest_api') as api:
+                   return download(api,vals)
 
 class document_directory(osv.osv):
 
