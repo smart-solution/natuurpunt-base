@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 ##############################################################################
 #
+#    Smart Solution bvba
+#    Copyright (C) 2010-Today Smart Solution BVBA (<http://www.smartsolution.be>).
+#
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU Affero General Public License as
 #    published by the Free Software Foundation, either version 3 of the
@@ -16,4 +19,5 @@
 #
 ############################################################################## 
 
-import natuurpunt_cmis
+import document_cmis
+import controllers

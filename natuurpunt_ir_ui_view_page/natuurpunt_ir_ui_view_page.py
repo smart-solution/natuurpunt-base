@@ -289,28 +289,27 @@ class view_with_page(osv.osv):
                           seq = seq + 1
                           val['seq'] = seq
                           pages.append(val)
+          def module_depth(module,depth):
+              return module + '(' + str(depth) + ')'
           def create_page_record(values):
-              del values['seq']
               values['changes'] = changes
-              if not modules:
-                  values['modules'] = values['module']
-              else:
-                  values['modules'] = ','.join(modules)
+              values['modules'] = values['module'] if not modules else ','.join(modules)
+              del values['seq']
               del values['module']
               page_ids.append(self.pool.get('ir.ui.view.page').create(cr,uid,values)) 
-          modules = []
+          modules = []       
           for prev,current in neighborhood(sorted(pages, key=lambda k: (k['name'], k['seq']))):
               if prev and prev['name'] <> current['name']:
                   create_page_record(prev)
                   changes = 0
-                  modules = [current['module']]
+                  modules = [module_depth(current['module'], depth[current['ref_id']])]
               elif prev and prev['name'] == current['name']:
                   if prev['groups_id'] <> current['groups_id']:
                       changes = changes + 1
-                      modules.append(current['module'])
+                      modules.append(module_depth(current['module'], depth[current['ref_id']]))
               else:
                   changes = 0
-                  modules = [current['module']]
+                  modules = [module_depth(current['module'], depth[current['ref_id']])]
           if modules:
               create_page_record(current)
           self.write(cr,uid,ids,{'page_ids':[(6,0,page_ids)]})
