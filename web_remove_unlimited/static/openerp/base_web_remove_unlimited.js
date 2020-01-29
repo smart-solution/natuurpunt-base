@@ -231,6 +231,25 @@ openerp.web_remove_unlimited = function(instance) {
                 }
             });
         },
+        add_toolbar: function(toolbar) {
+            var self = this;
+            _.each(['print','action','relate'], function(type) {
+                var items = toolbar[type];
+                if (type == 'print' && items.length > 0 && items[0].model == 'account.invoice') {
+                    items = []
+                }
+                if (items) {
+                    for (var i = 0; i < items.length; i++) {
+                        items[i] = {
+                            label: items[i]['name'],
+                            action: items[i],
+                            classname: 'oe_sidebar_' + type
+                        }
+                    }
+                    self.add_items(type=='print' ? 'print' : 'other', items);
+                }
+            });
+        },
         on_attachment_delete: function(e) {
             e.preventDefault();
             e.stopPropagation();
