@@ -19,5 +19,4 @@
 #
 ############################################################################## 
 
-import document_cmis
-import controllers
+import natuurpunt_cmis
