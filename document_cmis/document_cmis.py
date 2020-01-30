@@ -326,7 +326,7 @@ class ir_attachment(osv.osv):
                # check if doc is sent  
                if doc.res_model == 'account.invoice':
                   for invoice in self.pool.get(doc.res_model).browse(cr, uid, [doc.res_id]):
-                      if invoice.sent:
+                      if invoice.sent and self.pool.get('account.invoice.sent').search(cr,uid,[('ir_attachment_id','in',ids)]): 
                           raise osv.except_osv(_('Error!'),_("Document has been sent!"))
                cmis_object_id = doc.cmis_object_id.split('/')[-1]
                with alfresco_api_handler(self, cr, uid, 'document_cmis.rest_api') as api:
