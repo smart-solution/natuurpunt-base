@@ -260,6 +260,10 @@ class ir_attachment(osv.osv):
         'datas': fields.function(_data_get, fnct_inv=_data_set, string='File Content', type="binary", nodrop=True),
     }
 
+    def check(self, cr, uid, ids, mode, context=None, values=None):
+        """Overwrite check to verify access on directory to validate specifications of doc/access_permissions.rst"""
+        pass
+
     def create(self, cr, uid, vals, context=None):
         """Send the document to the CMIS server and create the attachment"""
 
