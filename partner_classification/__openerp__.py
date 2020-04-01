@@ -14,7 +14,7 @@
     "depends" : ["base",],
     "update_xml" : [
         'partner_classification_view.xml',
-#        'security/ir.model.access.csv'
+        'security/ir.model.access.csv'
         ],
     "active": False,
     "installable": True
