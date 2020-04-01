@@ -55,7 +55,8 @@
         <field name="act_window_id" ref="action_partner_classification"/>
     </record>
 
-    <menuitem name="Partner Classes" id="menu_partner_classification_form" action="action_partner_classification" parent = "base.menu_base_config" sequence="100"/>
+    <menuitem name="Partner Classes" id="menu_partner_classification_form" action="action_partner_classification" 
+              parent = "base.menu_base_config" sequence="100" groups="base.group_system"/>
 
     <record model="ir.ui.view" id="partner_classification_partner_form">
         <field name="name">partner.classification.partner.form</field>

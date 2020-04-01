@@ -34,3 +34,5 @@ from toolkit import get_included_product_ids
 from koalect import koalect_webservice
 
 import report
+
+import visitor
