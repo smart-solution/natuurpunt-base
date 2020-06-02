@@ -235,7 +235,7 @@ openerp.web_remove_unlimited = function(instance) {
             var self = this;
             _.each(['print','action','relate'], function(type) {
                 var items = toolbar[type];
-                if (type == 'print' && items.length > 0 && items[0].model == 'account.invoice') {
+                if (type == 'print' && items && items.length > 0 && items[0].model == 'account.invoice') {
                     items = []
                 }
                 if (items) {
