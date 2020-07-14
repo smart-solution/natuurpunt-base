@@ -23,6 +23,19 @@ from openerp.tools.translate import _
 from lxml import etree
 from openerp.osv.orm import setup_modifiers
 from natuurpunt_tools import uids_in_group
+from functools import partial
+
+def neighborhood(iterator):
+    prev = -1
+    for current in iterator:
+        yield (prev,current)
+        prev = current
+
+def fn(p,c):
+    if p > -1:
+       return c if c-1 != p else -1
+    else:
+       return c
 
 class account_analytic_account(osv.osv):
     _inherit = 'account.analytic.account'
@@ -49,6 +62,60 @@ ir_attachment()
 
 class res_partner(osv.osv):
     _inherit = 'res.partner'
+
+    def adress_history_domain(self, cr, user, args):
+
+        def args_filter(elem):
+            if elem[0] == 'display_name':
+                return ['name',elem[1],elem[2]]
+            if elem[0] == 'zip_id':
+                try:
+                   city = self.pool.get('res.country.city').browse(cr,user,elem[2])
+                   return ['zip',elem[1],str(city.zip)]
+                except:
+                   return False
+            if elem[0] not in ['name','street','zip','city']:
+                return False
+            else:
+                return elem
+
+        c = args.count('|')
+        if not c:
+            return { '&': filter(None,map(args_filter,args)), }
+        if len(args)-c > c+1:
+            return {
+                '|': filter(None,map(args_filter,args[c:c*2+1])),
+                '&': filter(None,map(args_filter,args[c*2+1:])),
+            }
+        else:
+            return { '|': filter(None,map(args_filter,args[c:c*2+1])), }
+
+    def _search(self, cr, user, args, offset=0, limit=None, order=None, context=None, count=False, access_rights_uid=None):
+        res = super(res_partner, self)._search(cr, user, args, offset=offset, limit=limit, order=order, context=context,
+                                                count=count, access_rights_uid=access_rights_uid)
+
+        idx = [i for i,e in enumerate(args) if e == '|']
+        index = [0] + filter(lambda x:x>-1,[fn(p,c) for p,c in neighborhood(idx)])
+        args2 = []
+        hist_args = []
+        for p,c in neighborhood(list(set(index))):
+            if p != -1:
+                args2.append(args[p:c])
+        else:
+            args2.append(args[c:])
+
+        for d in map(partial(self.adress_history_domain,cr,user),args2):
+            if '|' in d:
+                hist_args = hist_args + ['|' for x in range(len(d['|'])-1)] + d['|']
+            if '&' in d:
+                hist_args = hist_args + d['&']
+
+        if hist_args:
+            history_ids = self.pool.get('res.partner.address.history').search(cr,user,hist_args,context=context)
+            for partner in self.pool.get('res.partner.address.history').browse(cr,user,history_ids):
+                if partner.partner_id and partner.partner_id.id not in res:
+                    res.append(partner.partner_id.id)
+        return res
 
     def _edit_only(self,cr,uid,ids,fieldnames,args,context=None):
         res = dict.fromkeys(ids)
