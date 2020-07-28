@@ -66,7 +66,7 @@ class res_partner(osv.osv):
     def adress_history_domain(self, cr, user, args):
 
         def args_filter(elem):
-            if elem[0] == 'display_name':
+            if elem[0] == 'display_name' or elem[0] == 'last_name':
                 return ['name',elem[1],elem[2]]
             if elem[0] == 'zip_id':
                 try:
