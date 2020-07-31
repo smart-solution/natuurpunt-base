@@ -294,10 +294,9 @@ openerp.web_remove_unlimited = function(instance) {
         load_list: function(data) {
             var self = this;
             var ret = this._super.apply(this, arguments); 
-            if (this.dataset.model=='res.partner') {
-              if ( this.sidebar )
-                 this.sidebar.remove_export();
-              this.$pager.find('.oe_list_pager_state')
+            if (this.dataset.model=='res.partner' && this.sidebar) 
+                this.sidebar.remove_export();           
+            this.$pager.find('.oe_list_pager_state')
                     .click(function (e) {
                         e.stopPropagation();
                         var $this = $(this);
@@ -309,9 +308,7 @@ openerp.web_remove_unlimited = function(instance) {
                                     '<option value="200">200</option>' +
                                     '<option value="500">500</option>' +
                                     '<option value="2000">2000</option>' +
-                                    '<option value="5000">5000</option>' +
-                                    '<option value="10000">10000</option>' +
-                                    '<option value="15000">15000</option>')
+                                    '<option value="5000">5000</option>')
                             .change(function () {
                                 var val = parseInt($select.val(), 10);
                                 self._limit = (isNaN(val) ? null : val);
@@ -321,8 +318,7 @@ openerp.web_remove_unlimited = function(instance) {
                                 $(this).trigger('change');
                             })
                             .val(self._limit || 'NaN');
-                    });
-            }
+                    });            
             return ret;
         },
     });
