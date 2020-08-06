@@ -8,6 +8,25 @@ openerp.web_remove_unlimited = function(instance) {
 
     var _t = instance.web._t;
 
+  /**
+ * Serializes concurrent calls to this asynchronous method. The method must
+ * return a deferred or promise.
+ *
+ * Current-implementation is class-serialized (the mutex is common to all
+ * instances of the list view). Can be switched to instance-serialized if
+ * having concurrent list views becomes possible and common.
+ */
+function synchronized(fn) {
+    var fn_mutex = new $.Mutex();
+    return function () {
+        var obj = this;
+        var args = _.toArray(arguments);
+        return fn_mutex.exec(function () {
+            if (obj.isDestroyed()) { return $.when(); }
+            return fn.apply(obj, args)
+        });
+    };
+}
     instance.web.search.Input.include({
         quick_filter: function () {
            if (this.attrs.context) {
@@ -291,6 +310,40 @@ openerp.web_remove_unlimited = function(instance) {
            }
            var ret = this._super.apply(this, arguments);
         },
+        reload_content: synchronized(function () {
+            var self = this;
+            self.$el.find('.oe_list_record_selector').prop('checked', false);
+            this.records.reset();
+            var reloaded = $.Deferred();
+            this.$el.find('.oe_list_content').append(
+                this.groups.render(function () {
+                    if (self.dataset.index == null) {
+                        if (self.records.length) {
+                            self.dataset.index = 0;
+                        }
+                    } else if (self.dataset.index >= self.records.length) {
+                        self.dataset.index = self.records.length ? 0 : null;
+                    }
+
+                    if (self.dataset.context.redirect_id) {
+                        self.do_activate_record(
+                            self.dataset.ids.indexOf(self.dataset.context.redirect_id),
+                            self.dataset.context.redirect_id,
+                            self.dataset,
+                            null);
+                        self.dataset.context.redirect_id = null;
+                    }
+                    else {
+                        self.compute_aggregates();
+                    }
+                    reloaded.resolve();
+                }));
+            this.do_push_state({
+                page: this.page,
+                limit: this._limit
+            });
+            return reloaded.promise();
+        }),
         load_list: function(data) {
             var self = this;
             var ret = this._super.apply(this, arguments); 
