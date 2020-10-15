@@ -2,6 +2,16 @@
 <openerp>
     <data>
 
+    <record id="remove_partner_followers" model="ir.ui.view">
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="mail.view_emails_partner_info_form" />
+        <field name="arch" type="xml">
+         <field name='message_follower_ids' position='attributes'>
+            <attribute name="invisible">1</attribute>
+         </field>
+        </field>
+    </record>
+
         <!-- Top menu item -->
     <menuitem name="Contacts"
             id="natuurpunt_contacten.menu_contact"

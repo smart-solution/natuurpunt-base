@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 ##############################################################################
 #
-#    Smart Solution bvba
-#    Copyright (C) 2010-Today Smart Solution BVBA (<http://www.smartsolution.be>).
-#
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU Affero General Public License as
 #    published by the Free Software Foundation, either version 3 of the
@@ -19,5 +16,19 @@
 #
 ############################################################################## 
 
-import document_cmis
-import controllers
+{
+    "name" : "natuurpunt_ir_ui_view_page.py",
+    "version" : "1.0",
+    "author" : "Natuurpunt (joeri.belis@natuurpunt.be)",
+    "website" : "www.natuurpunt.be",
+    "category" : "Base extention",
+    "description": """
+    tab pages management
+""",
+    "depends" : ["base",],   
+    "data" : ["natuurpunt_ir_ui_view_page_view.xml","natuurpunt_ir_ui_view_page_cron.xml","security/ir.model.access.csv",],
+    "init_xml" : [],
+    "update_xml" : [],
+    "active": False,
+    "installable": True
+}

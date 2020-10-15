@@ -11,6 +11,7 @@
           "natuurpunt_print_crm_invoice_wizard.xml",
           "natuurpunt_print_crm_invoice_report.xml",
           "security/ir.model.access.csv",
+          "wizard/crm_account_invoice_workflow.xml",
           ],
         "css": ["static/src/css/natuurpunt_print_crm_invoice.css"],
         "active": False,

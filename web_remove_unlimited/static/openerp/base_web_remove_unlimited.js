@@ -8,6 +8,25 @@ openerp.web_remove_unlimited = function(instance) {
 
     var _t = instance.web._t;
 
+  /**
+ * Serializes concurrent calls to this asynchronous method. The method must
+ * return a deferred or promise.
+ *
+ * Current-implementation is class-serialized (the mutex is common to all
+ * instances of the list view). Can be switched to instance-serialized if
+ * having concurrent list views becomes possible and common.
+ */
+function synchronized(fn) {
+    var fn_mutex = new $.Mutex();
+    return function () {
+        var obj = this;
+        var args = _.toArray(arguments);
+        return fn_mutex.exec(function () {
+            if (obj.isDestroyed()) { return $.when(); }
+            return fn.apply(obj, args)
+        });
+    };
+}
     instance.web.search.Input.include({
         quick_filter: function () {
            if (this.attrs.context) {
@@ -231,6 +250,25 @@ openerp.web_remove_unlimited = function(instance) {
                 }
             });
         },
+        add_toolbar: function(toolbar) {
+            var self = this;
+            _.each(['print','action','relate'], function(type) {
+                var items = toolbar[type];
+                if (type == 'print' && items && items.length > 0 && items[0].model == 'account.invoice') {
+                    items = []
+                }
+                if (items) {
+                    for (var i = 0; i < items.length; i++) {
+                        items[i] = {
+                            label: items[i]['name'],
+                            action: items[i],
+                            classname: 'oe_sidebar_' + type
+                        }
+                    }
+                    self.add_items(type=='print' ? 'print' : 'other', items);
+                }
+            });
+        },
         on_attachment_delete: function(e) {
             e.preventDefault();
             e.stopPropagation();
@@ -272,13 +310,46 @@ openerp.web_remove_unlimited = function(instance) {
            }
            var ret = this._super.apply(this, arguments);
         },
+        reload_content: synchronized(function () {
+            var self = this;
+            self.$el.find('.oe_list_record_selector').prop('checked', false);
+            this.records.reset();
+            var reloaded = $.Deferred();
+            this.$el.find('.oe_list_content').append(
+                this.groups.render(function () {
+                    if (self.dataset.index == null) {
+                        if (self.records.length) {
+                            self.dataset.index = 0;
+                        }
+                    } else if (self.dataset.index >= self.records.length) {
+                        self.dataset.index = self.records.length ? 0 : null;
+                    }
+
+                    if (self.dataset.context.redirect_id) {
+                        self.do_activate_record(
+                            self.dataset.ids.indexOf(self.dataset.context.redirect_id),
+                            self.dataset.context.redirect_id,
+                            self.dataset,
+                            null);
+                        self.dataset.context.redirect_id = null;
+                    }
+                    else {
+                        self.compute_aggregates();
+                    }
+                    reloaded.resolve();
+                }));
+            this.do_push_state({
+                page: this.page,
+                limit: this._limit
+            });
+            return reloaded.promise();
+        }),
         load_list: function(data) {
             var self = this;
             var ret = this._super.apply(this, arguments); 
-            if (this.dataset.model=='res.partner') {
-              if ( this.sidebar )
-                 this.sidebar.remove_export();
-              this.$pager.find('.oe_list_pager_state')
+            if (this.dataset.model=='res.partner' && this.sidebar) 
+                this.sidebar.remove_export();           
+            this.$pager.find('.oe_list_pager_state')
                     .click(function (e) {
                         e.stopPropagation();
                         var $this = $(this);
@@ -290,9 +361,7 @@ openerp.web_remove_unlimited = function(instance) {
                                     '<option value="200">200</option>' +
                                     '<option value="500">500</option>' +
                                     '<option value="2000">2000</option>' +
-                                    '<option value="5000">5000</option>' +
-                                    '<option value="10000">10000</option>' +
-                                    '<option value="15000">15000</option>')
+                                    '<option value="5000">5000</option>')
                             .change(function () {
                                 var val = parseInt($select.val(), 10);
                                 self._limit = (isNaN(val) ? null : val);
@@ -302,8 +371,7 @@ openerp.web_remove_unlimited = function(instance) {
                                 $(this).trigger('change');
                             })
                             .val(self._limit || 'NaN');
-                    });
-            }
+                    });            
             return ret;
         },
     });

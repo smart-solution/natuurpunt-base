@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+    <record id="pages_from_view_cron" model="ir.cron">
+        <field name="name">pages from view cron</field>
+        <field name="active" eval="False"/>
+        <field name="user_id" ref="base.user_root"/>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="numbercall">1</field>
+        <field name="doall" eval="False"/>
+        <field name="model" eval="'ir.ui.view'"/>
+        <field name="function" eval="'_recalc_pages_from_view'" />
+        <field name="args" eval="'()'"/>
+    </record>
+
+    </data>
+</openerp>

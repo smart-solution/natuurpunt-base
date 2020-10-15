@@ -143,8 +143,8 @@ def match_with_existing_partner(obj,cr,uid,data):
     ref_vals = get_match_vals(vals)
     if 'street_id' in vals and vals['street_id']:
        target_domain = [
-            ('street_id','=',vals['street_id']),
-            ('zip_id','=',vals['zip_id']),
+            ('street_id.id','=',vals['street_id']),
+            ('zip_id.id','=',vals['zip_id']),
             ('street_nbr','=',vals['street_nbr']),
        ]
     else:
