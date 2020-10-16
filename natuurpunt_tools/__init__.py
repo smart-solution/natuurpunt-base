@@ -37,5 +37,3 @@ from pom import open_pom_connection, get_pom_address
 import report
 
 import visitor
-
-import pybst
