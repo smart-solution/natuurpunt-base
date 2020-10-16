@@ -25,6 +25,13 @@ from openerp.osv.orm import setup_modifiers
 from natuurpunt_tools import uids_in_group
 from functools import partial
 
+CONTEXT_SEARCH = [
+    'default_supplier',
+    'default_customer',
+    'addressbook',
+    'search_default_all_members',
+]
+
 def neighborhood(iterator):
     prev = -1
     for current in iterator:
@@ -93,28 +100,28 @@ class res_partner(osv.osv):
     def _search(self, cr, user, args, offset=0, limit=None, order=None, context=None, count=False, access_rights_uid=None):
         res = super(res_partner, self)._search(cr, user, args, offset=offset, limit=limit, order=order, context=context,
                                                 count=count, access_rights_uid=access_rights_uid)
+        if context and any(key in context for key in CONTEXT_SEARCH):
+            idx = [i for i,e in enumerate(args) if e == '|']
+            index = [0] + filter(lambda x:x>-1,[fn(p,c) for p,c in neighborhood(idx)])
+            args2 = []
+            hist_args = []
+            for p,c in neighborhood(list(set(index))):
+                if p != -1:
+                    args2.append(args[p:c])
+            else:
+                args2.append(args[c:])
 
-        idx = [i for i,e in enumerate(args) if e == '|']
-        index = [0] + filter(lambda x:x>-1,[fn(p,c) for p,c in neighborhood(idx)])
-        args2 = []
-        hist_args = []
-        for p,c in neighborhood(list(set(index))):
-            if p != -1:
-                args2.append(args[p:c])
-        else:
-            args2.append(args[c:])
+            for d in map(partial(self.adress_history_domain,cr,user),args2):
+                if '|' in d:
+                    hist_args = hist_args + ['|' for x in range(len(d['|'])-1)] + d['|']
+                if '&' in d:
+                    hist_args = hist_args + d['&']
 
-        for d in map(partial(self.adress_history_domain,cr,user),args2):
-            if '|' in d:
-                hist_args = hist_args + ['|' for x in range(len(d['|'])-1)] + d['|']
-            if '&' in d:
-                hist_args = hist_args + d['&']
-
-        if hist_args:
-            history_ids = self.pool.get('res.partner.address.history').search(cr,user,hist_args,context=context)
-            for partner in self.pool.get('res.partner.address.history').browse(cr,user,history_ids):
-                if partner.partner_id and partner.partner_id.id not in res:
-                    res.append(partner.partner_id.id)
+            if hist_args:
+                history_ids = self.pool.get('res.partner.address.history').search(cr,user,hist_args,context=context)
+                for partner in self.pool.get('res.partner.address.history').browse(cr,user,history_ids):
+                    if partner.partner_id and partner.partner_id.id not in res:
+                        res.append(partner.partner_id.id)
         return res
 
     def _edit_only(self,cr,uid,ids,fieldnames,args,context=None):
