@@ -117,7 +117,7 @@ class res_partner(osv.osv):
                 if '&' in d:
                     hist_args = hist_args + d['&']
 
-            if hist_args:
+            if hist_args and len(hist_args) > 1:
                 history_ids = self.pool.get('res.partner.address.history').search(cr,user,hist_args,context=context)
                 for partner in self.pool.get('res.partner.address.history').browse(cr,user,history_ids):
                     if partner.partner_id and partner.partner_id.id not in res:

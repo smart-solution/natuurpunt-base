@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##############################################################################
 #
-#    Natuurpunt VZW
+#    Natuurpunt VZW:
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU Affero General Public License as
@@ -30,14 +30,30 @@ _logger = logging.getLogger(__name__)
 content_type_header = {'Content-type': 'application/json'}
 user_session = '/users/session'
 
-def get_pom_address(d):
+def setup_pom_http(param_obj):
+    pom_http = {}
+    pom_http['url'] = param_obj('pom.url')
+    pom_http['username'] = param_obj('pom.username')
+    pom_http['password'] = param_obj('pom.password')
+    pom_sender_id = param_obj('pom.sender_id')
+    return pom_http,pom_sender_id
+
+def get_pom_address(obj,cr,uid,d):
     try:
         if len(d) <= 1:
-            return d[0]['crabAddress']
+            adres = d[0]['crabAddress']
+            country_city_obj = obj.pool.get('res.country.city')
+            country_city_street_obj = obj.pool.get('res.country.city.street')
+            city_obj = country_city_obj.browse(cr, uid, adres['zip_id'])
+            street_obj = country_city_street_obj.browse(cr, uid, adres['street_id'])
+            adres['city'] = city_obj.name
+            adres['street'] = street_obj.name
+            adres['zip'] = city_obj.zip
+            return adres
         else:
             raise osv.except_osv(_("Error!"),_("pom webservice: communication returns more than 1 address!"))
-    except KeyError:
-        return []
+    except (KeyError,IndexError):
+        return {}
 
 def merge_two_dicts(x, y):
     z = x.copy()   # start with x's keys and values
@@ -67,8 +83,11 @@ def setup_pom_webservice(url,headers):
     return api_call_wrapper
 
 @contextmanager
-def pom_webservice_handler(url,username,password):
+def pom_webservice_handler(pom_http):
     try:
+        url = pom_http['url']
+        username = pom_http['username']
+        password = pom_http['password']
         headers = merge_two_dicts(content_type_header,authentication_header(url,username,password))
         pom_webservice = setup_pom_webservice(url,headers)
         yield pom_webservice
@@ -86,9 +105,9 @@ def pom_webservice_handler(url,username,password):
         raise osv.except_osv(_("pom webservice HTTPError!"),_(err))
 
 @contextmanager
-def open_pom_connection(url,username,password):
+def open_pom_connection(pom_http):
     def get_data(rest):
-        with pom_webservice_handler(url,username,password) as pom_api:
+        with pom_webservice_handler(pom_http) as pom_api:
             response = pom_api(rest)
             return response.json()
     yield get_data
