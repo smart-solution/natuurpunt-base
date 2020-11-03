@@ -36,6 +36,7 @@ def setup_pom_http(param_obj):
     pom_http['username'] = param_obj('pom.username')
     pom_http['password'] = param_obj('pom.password')
     pom_sender_id = param_obj('pom.sender_id')
+    pom_http['partner_id'] = param_obj('pom.partner_id')
     return pom_http,pom_sender_id
 
 def get_pom_address(obj,cr,uid,d):
